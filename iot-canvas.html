@@ -537,6 +537,55 @@
   }
   .drag-ghost .dg-icon img { display: block; }
   .drag-ghost .dg-label { font-size: 12px; font-weight: 500; color: #000; }
+
+  /* ── Proto 2.0 additions ── */
+  .v2-panel .np-body { width: 310px; }
+  .v2-panel .node-card { gap: 12px; padding: 10px; border-radius: 6px; transition: background 0.12s; }
+  .v2-panel .node-card:hover { background: #FAFAFA; }
+  .v2-panel .node-icon { width: 54px; height: 54px; border-radius: 0; }
+  .v2-panel .node-icon img { display: block; width: 54px; height: 54px; }
+  .v2-panel .node-text { flex: 1; min-width: 0; }
+  .v2-panel .node-label { font-size: 14px; line-height: 20px; color: #212121; }
+  .v2-panel .node-desc { font-size: 12px; font-weight: 400; line-height: 16px; color: #757575; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .v2-panel .node-drag { display: none; }
+  .v2-panel .np-ai-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 10px; margin-top: 16px;
+    background: #3296DC; color: #fff; border: none; border-radius: 6px;
+    font-size: 14px; font-weight: 500; line-height: 20px;
+    cursor: pointer; font-family: var(--font);
+  }
+  .v2-panel .np-ai-btn:hover { background: #2a86cc; }
+  .v2-panel .np-ai-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .canvas-node.vertical { flex-direction: column; align-items: center; transform-origin: center top; }
+  .canvas-node.vertical .cn-conn { margin: -8px 0; }
+  .canvas-node.vertical .cn-conn-group { flex-direction: row; gap: 8px; margin: -8px 0; }
+  .canvas-node.vertical .cn-conn-group .cn-conn { margin: 0; }
+
+  .cn-shape-icon { width: 54px; height: 54px; flex-shrink: 0; display: block; }
+
+  .v2-canvas .cn-body {
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1; transition: box-shadow 0.15s;
+    padding: 0; background: transparent; border: none; border-radius: 0; max-width: none;
+  }
+  .v2-canvas .cn-icon { display: none; }
+  .v2-canvas .cn-label {
+    position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    margin-top: 6px; font-size: 11px; font-weight: 500; line-height: 14px;
+    color: #333; text-align: center; white-space: nowrap;
+    max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+    pointer-events: none;
+  }
+  .v2-canvas .canvas-node.active .cn-body { box-shadow: 0 0 0 3px rgba(50,150,220,0.35); border-radius: 50%; }
+  .v2-canvas .drag-ghost {
+    flex-direction: column; gap: 4px; padding: 0; background: transparent; border: none;
+    box-shadow: none; opacity: 0.85; transform: scale(1); border-radius: 0;
+  }
+  .v2-canvas .drag-ghost .dg-icon { width: 54px; height: 54px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); }
+  .v2-canvas .drag-ghost .dg-icon img { width: 54px; height: 54px; }
+  .v2-canvas .drag-ghost .dg-label { font-size: 11px; color: #333; }
 </style>
 
 <div class="sidebar" id="sidebar">
@@ -571,6 +620,7 @@
             <div class="flow-menu-item active" data-flow="test">Test flow</div>
             <div class="flow-menu-item" data-flow="qa">QA edited</div>
             <div class="flow-menu-item" data-flow="antitheft">Anti-theft protection</div>
+            <div class="flow-menu-item" data-flow="vertical" id="verticalFlowItem" style="display:none">Vertical test flow</div>
           </div>
         </div>
         <div class="more-btn">
@@ -673,6 +723,110 @@
         <svg class="np-toggle-hover" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.6 6.1V13.9L14.8 10L10.6 6.1ZM3.275 18.4C2.81433 18.4 2.42 18.236 2.092 17.908C1.764 17.58 1.6 17.1857 1.6 16.725V3.275C1.6 2.81433 1.764 2.42 2.092 2.092C2.42 1.764 2.81433 1.6 3.275 1.6H16.725C17.1857 1.6 17.58 1.764 17.908 2.092C18.236 2.42 18.4 2.81433 18.4 3.275V16.725C18.4 17.1857 18.236 17.58 17.908 17.908C17.58 18.236 17.1857 18.4 16.725 18.4H3.275ZM6.4 16.6V3.4H3.4V16.6H6.4ZM8.2 16.6H16.6V3.4H8.2V16.6Z" fill="black" fill-opacity="0.4"/></svg>
       </div>
     </div>
+    <div class="nodes-panel v2-panel" id="nodesPanelV2" style="display:none">
+      <div class="np-body">
+        <div class="np-header">
+          <span class="np-title">Nodes</span>
+          <div class="np-collapse-btn" onclick="toggleNodesPanel()">
+            <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIG92ZXJmbG93PSJ2aXNpYmxlIiBzdHlsZT0iZGlzcGxheTogYmxvY2s7IiB2aWV3Qm94PSIwIDAgMjAgMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDb250cm9scy9sZWZ0X3BhbmVsX2Nsb3NlXzIwZHBfMUYxRjFGX0ZJTEwwX3dnaHQ0MDBfR1JBRDBfb3BzejIwIDEiPgo8cGF0aCBpZD0iVmVjdG9yIiBkPSJNMTMuNTAwMSAxMy4yNVY2Ljc1TDEwLjAwMDEgMTBMMTMuNTAwMSAxMy4yNVpNNC4zOTU5MSAxN0M0LjAxMjAzIDE3IDMuNjgzNDEgMTYuODYzMyAzLjQxMDA4IDE2LjU5QzMuMTM2NzUgMTYuMzE2NyAzLjAwMDA4IDE1Ljk4ODEgMy4wMDAwOCAxNS42MDQyVjQuMzk1ODNDMy4wMDAwOCA0LjAxMTk0IDMuMTM2NzUgMy42ODMzMyAzLjQxMDA4IDMuNDFDMy42ODM0MSAzLjEzNjY3IDQuMDEyMDMgMyA0LjM5NTkxIDNIMTUuNjA0MkMxNS45ODgxIDMgMTYuMzE2NyAzLjEzNjY3IDE2LjU5MDEgMy40MUMxNi44NjM0IDMuNjgzMzMgMTcuMDAwMSA0LjAxMTk0IDE3LjAwMDEgNC4zOTU4M1YxNS42MDQyQzE3LjAwMDEgMTUuOTg4MSAxNi44NjM0IDE2LjMxNjcgMTYuNTkwMSAxNi41OUMxNi4zMTY3IDE2Ljg2MzMgMTUuOTg4MSAxNyAxNS42MDQyIDE3SDQuMzk1OTFaTTcuMDAwMDggMTUuNVY0LjVINC41MDAwOFYxNS41SDcuMDAwMDhaTTguNTAwMDggMTUuNUgxNS41MDAxVjQuNUg4LjUwMDA4VjE1LjVaIiBmaWxsPSJ2YXIoLS1maWxsLTAsIGJsYWNrKSIgZmlsbC1vcGFjaXR5PSIwLjQiLz4KPC9nPgo8L3N2Zz4K" alt="Collapse">
+          </div>
+        </div>
+        <div class="np-category">
+          <div class="np-cat-header">
+            <span class="np-cat-name">Start with</span>
+            <span class="np-cat-tag">required</span>
+          </div>
+          <div class="np-cat-items">
+            <div class="node-card">
+              <div class="node-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCA1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjU0Ij48Y2lyY2xlIGN4PSIyNyIgY3k9IjI3IiByPSIyNiIgZmlsbD0iI0U1RTlGRiIgc3Ryb2tlPSIjMDA3NkZGIiBzdHJva2Utd2lkdGg9IjIiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxOCwxMykgc2NhbGUoMSkiPjxwYXRoIGQ9Ik0xMi41NzY2IDEwLjVINS41NzY2MUM0LjkzNDk0IDEwLjUgNC40MDk5NCAxMS4wMjUgNC40MDk5NCAxMS42NjY3VjI1LjY2NjdDNC40MDk5NCAyNi4zMDgzIDQuOTM0OTQgMjYuODMzMyA1LjU3NjYxIDI2LjgzMzNIMTIuNTc2NkMxMy4yMTgzIDI2LjgzMzMgMTMuNzQzMyAyNi4zMDgzIDEzLjc0MzMgMjUuNjY2N1YxMS42NjY3QzEzLjc0MzMgMTEuMDI1IDEzLjIxODMgMTAuNSAxMi41NzY2IDEwLjVaTTExLjQwOTkgMjQuNUg2Ljc0MzI3VjEyLjgzMzNIMTEuNDA5OVYyNC41WiIgZmlsbD0iIzAwNzZGRiIvPjxwYXRoIGQ9Ik05LjA3NjYxIDE2LjMzMzNDOS43MjA5NCAxNi4zMzMzIDEwLjI0MzMgMTUuODExIDEwLjI0MzMgMTUuMTY2N0MxMC4yNDMzIDE0LjUyMjMgOS43MjA5NCAxNCA5LjA3NjYxIDE0QzguNDMyMjcgMTQgNy45MDk5NCAxNC41MjIzIDcuOTA5OTQgMTUuMTY2N0M3LjkwOTk0IDE1LjgxMSA4LjQzMjI3IDE2LjMzMzMgOS4wNzY2MSAxNi4zMzMzWiIgZmlsbD0iIzAwNzZGRiIvPjxwYXRoIGQ9Ik0zLjMwMTY3IDcuMDU4MzNMNC45NDY2NyA4LjcwMzMzQzYuMDA4MzMgNy42NTMzMyA3LjQ2NjY3IDcgOS4wNzY2NyA3QzEwLjY4NjcgNyAxMi4xNDUgNy42NTMzMyAxMy4yMDY3IDguNzAzMzNMMTQuODUxNyA3LjA1ODMzQzEzLjM3IDUuNTc2NjcgMTEuMzI4MyA0LjY2NjY3IDkuMDc2NjcgNC42NjY2N0M2LjgyNSA0LjY2NjY3IDQuNzgzMzMgNS41NzY2NyAzLjMwMTY3IDcuMDU4MzNaTTkuMDc2NjcgMEM1LjUzIDAgMi4zMjE2NyAxLjQzNSAwIDMuNzU2NjdMMS42NDUgNS40MDE2N0MzLjU0NjY3IDMuNTExNjcgNi4xNzE2NyAyLjMzMzMzIDkuMDc2NjcgMi4zMzMzM0MxMS45ODE3IDIuMzMzMzMgMTQuNjA2NyAzLjUxMTY3IDE2LjQ5NjcgNS40MTMzM0wxOC4xNDE3IDMuNzY4MzNDMTUuODMxNyAxLjQzNSAxMi42MjMzIDAgOS4wNzY2NyAwWiIgZmlsbD0iIzAwNzZGRiIvPjwvZz48L3N2Zz4=" width="54" height="54" alt="Data Source">
+              </div>
+              <div class="node-text">
+                <span class="node-label">Data Source</span>
+                <span class="node-desc">IoT device or sensor input</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="np-category">
+          <div class="np-cat-header">
+            <span class="np-cat-name">Process</span>
+            <span class="np-cat-tag">optional</span>
+          </div>
+          <div class="np-cat-items">
+            <div class="node-card">
+              <div class="node-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCA1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjU0Ij48cG9seWdvbiBwb2ludHM9IjI3LDIuMDYgNTEuOTQsMjcgMjcsNTEuOTQgMi4wNiwyNyIgZmlsbD0iI0YyRURGRiIgc3Ryb2tlPSIjN0M0REZGIiBzdHJva2Utd2lkdGg9IjIiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNC41LDE0LjUpIHNjYWxlKDEpIj48cGF0aCBkPSJNMTEuNDU4MyAyMi45MTY3VjE3LjcwODNDMTEuNDU4MyAxNi43MzYxIDExLjMxMDggMTYuMDE1NiAxMS4wMTU2IDE1LjU0NjlDMTAuNzIwNSAxNS4wNzgxIDEwLjMyOTkgMTQuNjE4MSA5Ljg0Mzc1IDE0LjE2NjdMMTEuMzI4MSAxMi42ODIzQzExLjUzNjUgMTIuODczMyAxMS43MzYxIDEzLjA3NzMgMTEuOTI3MSAxMy4yOTQzQzEyLjExODEgMTMuNTExMyAxMi4zMDkgMTMuNzQxMyAxMi41IDEzLjk4NDRDMTIuNzQzMSAxMy42NTQ1IDEyLjk5MDUgMTMuMzYzNyAxMy4yNDIyIDEzLjExMkMxMy40OTM5IDEyLjg2MDIgMTMuNzUgMTIuNjEyOCAxNC4wMTA0IDEyLjM2OThDMTQuNjcwMSAxMS43NjIyIDE1LjI2OTEgMTEuMDU5IDE1LjgwNzMgMTAuMjYwNEMxNi4zNDU1IDkuNDYxODEgMTYuNjMxOSA4LjA2NDI0IDE2LjY2NjcgNi4wNjc3MUwxNS4wMjYgNy43MDgzM0wxMy41NDE3IDYuMjVMMTcuNzA4MyAyLjA4MzMzTDIxLjg3NSA2LjI1TDIwLjQxNjcgNy43MDgzM0wxOC43NSA2LjA2NzcxQzE4LjcxNTMgOC41NTAzNSAxOC4zMzMzIDEwLjMxNjggMTcuNjA0MiAxMS4zNjcyQzE2Ljg3NSAxMi40MTc1IDE2LjE0NTggMTMuMjcyNiAxNS40MTY3IDEzLjkzMjNDMTQuODYxMSAxNC40MzU4IDE0LjQwOTcgMTQuOTI2MiAxNC4wNjI1IDE1LjQwMzZDMTMuNzE1MyAxNS44ODExIDEzLjU0MTcgMTYuNjQ5MyAxMy41NDE3IDE3LjcwODNWMjIuOTE2N0gxMS40NTgzWk02LjQ1ODMzIDguNTE1NjNDNi4zODg4OSA4LjE2ODQgNi4zNDExNSA3Ljc4NjQ2IDYuMzE1MSA3LjM2OTc5QzYuMjg5MDYgNi45NTMxMyA2LjI2NzM2IDYuNTE5MSA2LjI1IDYuMDY3NzFMNC41ODMzMyA3LjcwODMzTDMuMTI1IDYuMjVMNy4yOTE2NyAyLjA4MzMzTDExLjQ1ODMgNi4yNUw5Ljk3Mzk2IDcuNzA4MzNMOC4zMzMzMyA2LjA5Mzc1QzguMzMzMzMgNi40NTgzMyA4LjM1MDcgNi44MDEyMiA4LjM4NTQyIDcuMTIyNEM4LjQyMDE0IDcuNDQzNTggOC40NTQ4NiA3Ljc0MzA2IDguNDg5NTggOC4wMjA4M0w2LjQ1ODMzIDguNTE1NjNaTTguNjk3OTIgMTMuMDk5QzguMzUwNyAxMi43MzQ0IDguMDE2NDkgMTIuMzA5IDcuNjk1MzEgMTEuODIyOUM3LjM3NDEzIDExLjMzNjggNy4wOTIwMSAxMC43Mzc4IDYuODQ4OTYgMTAuMDI2TDguODU0MTcgOS41MzEyNUM5LjAyNzc4IDEwIDkuMjI3NDMgMTAuMzk5MyA5LjQ1MzEzIDEwLjcyOTJDOS42Nzg4MiAxMS4wNTkgOS45MjE4OCAxMS4zNTQyIDEwLjE4MjMgMTEuNjE0Nkw4LjY5NzkyIDEzLjA5OVoiIGZpbGw9IiM3QzRERkYiLz48L2c+PC9zdmc+" width="54" height="54" alt="IF/THEN Logic">
+              </div>
+              <div class="node-text">
+                <span class="node-label">IF/THEN Logic</span>
+                <span class="node-desc">Conditional branching logic</span>
+              </div>
+            </div>
+            <div class="node-card">
+              <div class="node-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCA1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjU0Ij48cG9seWdvbiBwb2ludHM9IjI3LDIuMDYgNTEuOTQsMjcgMjcsNTEuOTQgMi4wNiwyNyIgZmlsbD0iI0YyRURGRiIgc3Ryb2tlPSIjN0M0REZGIiBzdHJva2Utd2lkdGg9IjIiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxLDEpIHNjYWxlKDAuOTYpIj48cGF0aCBkPSJNMjIuMjk3IDMyLjg5MTFIMjMuODg2MVYzMC43NzIzSDI2LjAwNVYyOS4xODMySDIzLjg4NjFWMjcuMDY0NEgyMi4yOTdWMjkuMTgzMkgyMC4xNzgyVjMwLjc3MjNIMjIuMjk3VjMyLjg5MTFaTTI3LjU5NDEgMzIuMDk2NkgzMi44OTExVjMwLjUwNzRIMjcuNTk0MVYzMi4wOTY2Wk0yNy41OTQxIDI5LjQ0OEgzMi44OTExVjI3Ljg1ODlIMjcuNTk0MVYyOS40NDhaTTI4Ljc1OTQgMjUuNDIyM0wzMC4yNDI2IDIzLjkzOTFMMzEuNzI1OCAyNS40MjIzTDMyLjgzODEgMjQuMzA5OUwzMS4zNTUgMjIuNzczOEwzMi44MzgxIDIxLjI5MDZMMzEuNzI1OCAyMC4xNzgyTDMwLjI0MjYgMjEuNjYxNEwyOC43NTk0IDIwLjE3ODJMMjcuNjQ3IDIxLjI5MDZMMjkuMTMwMiAyMi43NzM4TDI3LjY0NyAyNC4zMDk5TDI4Ljc1OTQgMjUuNDIyM1pNMjAuNDQzMSAyMy41NjgzSDI1Ljc0MDFWMjEuOTc5MkgyMC40NDMxVjIzLjU2ODNaTTE5LjExODggMzYuMDY5M0MxOC41MzYxIDM2LjA2OTMgMTguMDM3MyAzNS44NjE5IDE3LjYyMjQgMzUuNDQ2OUMxNy4yMDc1IDM1LjAzMiAxNyAzNC41MzMyIDE3IDMzLjk1MDVWMTkuMTE4OEMxNyAxOC41MzYxIDE3LjIwNzUgMTguMDM3MyAxNy42MjI0IDE3LjYyMjRDMTguMDM3MyAxNy4yMDc1IDE4LjUzNjEgMTcgMTkuMTE4OCAxN0gzMy45NTA1QzM0LjUzMzIgMTcgMzUuMDMyIDE3LjIwNzUgMzUuNDQ2OSAxNy42MjI0QzM1Ljg2MTkgMTguMDM3MyAzNi4wNjkzIDE4LjUzNjEgMzYuMDY5MyAxOS4xMTg4VjMzLjk1MDVDMzYuMDY5MyAzNC41MzMyIDM1Ljg2MTkgMzUuMDMyIDM1LjQ0NjkgMzUuNDQ2OUMzNS4wMzIgMzUuODYxOSAzNC41MzMyIDM2LjA2OTMgMzMuOTUwNSAzNi4wNjkzSDE5LjExODhaTTE5LjExODggMzMuOTUwNUgzMy45NTA1VjE5LjExODhIMTkuMTE4OFYzMy45NTA1WiIgZmlsbD0iIzdDNERGRiIvPjwvZz48L3N2Zz4=" width="54" height="54" alt="Initial attributes">
+              </div>
+              <div class="node-text">
+                <span class="node-label">Initial attributes</span>
+                <span class="node-desc">Set or calculate values</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="np-category">
+          <div class="np-cat-header">
+            <span class="np-cat-name">Action</span>
+            <span class="np-cat-tag">optional</span>
+          </div>
+          <div class="np-cat-items">
+            <div class="node-card">
+              <div class="node-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCA1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjU0Ij48cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHJ4PSIxMi4xMDUzIiBmaWxsPSIjRkNFNEZCIiBzdHJva2U9IiNEQzAwRDEiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0yNC45MTIyIDM1LjkyOEwzMi4zNjQyIDI3SDI2LjYwNDJMMjcuNjQ4MiAxOC44MjhMMjAuOTg4MiAyOC40NEgyNS45OTIyTDI0LjkxMjIgMzUuOTI4Wk0yMS4yNDAyIDQxLjRMMjIuNjgwMiAzMS4zMkgxNS40ODAyTDI4LjQ0MDIgMTIuNkgzMS4zMjAyTDI5Ljg4MDIgMjQuMTJIMzguNTIwMkwyNC4xMjAyIDQxLjRIMjEuMjQwMloiIGZpbGw9IiNEQzAwRDEiLz48L3N2Zz4=" width="54" height="54" alt="Device Action">
+              </div>
+              <div class="node-text">
+                <span class="node-label">Device Action</span>
+                <span class="node-desc">Send commands to device</span>
+              </div>
+            </div>
+            <div class="node-card">
+              <div class="node-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCA1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjU0Ij48cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHJ4PSIxMi4xMDUzIiBmaWxsPSIjRkNFNEZCIiBzdHJva2U9IiNEQzAwRDEiIHN0cm9rZS13aWR0aD0iMiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyLDEyKSBzY2FsZSgxKSI+PHBhdGggZD0iTTguNzUgMjYuMjVDNy4wMjA4MyAyNi4yNSA1LjU0Njg3IDI1LjY0MDYgNC4zMjgxMiAyNC40MjE5QzMuMTA5MzcgMjMuMjAzMSAyLjUgMjEuNzI5MiAyLjUgMjBDMi41IDE4LjQ3OTIgMi45NzM5NiAxNy4xNTEgMy45MjE4NyAxNi4wMTU2QzQuODY5NzkgMTQuODgwMiA2LjA2MjUgMTQuMTY2NyA3LjUgMTMuODc1VjE2LjQ2ODdDNi43NzA4MyAxNi43MTg3IDYuMTcxODcgMTcuMTY2NyA1LjcwMzEyIDE3LjgxMjVDNS4yMzQzNyAxOC40NTgzIDUgMTkuMTg3NSA1IDIwQzUgMjEuMDQxNyA1LjM2NDU4IDIxLjkyNzEgNi4wOTM3NSAyMi42NTYyQzYuODIyOTIgMjMuMzg1NCA3LjcwODMzIDIzLjc1IDguNzUgMjMuNzVDOS43OTE2NyAyMy43NSAxMC42NzcxIDIzLjM4NTQgMTEuNDA2MiAyMi42NTYyQzEyLjEzNTQgMjEuOTI3MSAxMi41IDIxLjA0MTcgMTIuNSAyMFYxOC43NUgxOS44NDM3QzIwLjAxMDQgMTguNTYyNSAyMC4yMTM1IDE4LjQxMTUgMjAuNDUzMSAxOC4yOTY5QzIwLjY5MjcgMTguMTgyMyAyMC45NTgzIDE4LjEyNSAyMS4yNSAxOC4xMjVDMjEuNzcwOCAxOC4xMjUgMjIuMjEzNSAxOC4zMDczIDIyLjU3ODEgMTguNjcxOUMyMi45NDI3IDE5LjAzNjUgMjMuMTI1IDE5LjQ3OTIgMjMuMTI1IDIwQzIzLjEyNSAyMC41MjA4IDIyLjk0MjcgMjAuOTYzNSAyMi41NzgxIDIxLjMyODFDMjIuMjEzNSAyMS42OTI3IDIxLjc3MDggMjEuODc1IDIxLjI1IDIxLjg3NUMyMC45NTgzIDIxLjg3NSAyMC42OTI3IDIxLjgxNzcgMjAuNDUzMSAyMS43MDMxQzIwLjIxMzUgMjEuNTg4NSAyMC4wMTA0IDIxLjQzNzUgMTkuODQzNyAyMS4yNUgxNC44NzVDMTQuNTgzMyAyMi42ODc1IDEzLjg2OTggMjMuODgwMiAxMi43MzQ0IDI0LjgyODFDMTEuNTk5IDI1Ljc3NiAxMC4yNzA4IDI2LjI1IDguNzUgMjYuMjVaTTIxLjI1IDI2LjI1QzIwLjA4MzMgMjYuMjUgMTkuMDI2IDI1Ljk2MzUgMTguMDc4MSAyNS4zOTA2QzE3LjEzMDIgMjQuODE3NyAxNi4zODU0IDI0LjA2MjUgMTUuODQzNyAyMy4xMjVIMTkuMTg3NUMxOS40NzkyIDIzLjMzMzMgMTkuODAyMSAyMy40ODk2IDIwLjE1NjIgMjMuNTkzN0MyMC41MTA0IDIzLjY5NzkgMjAuODc1IDIzLjc1IDIxLjI1IDIzLjc1QzIyLjI5MTcgMjMuNzUgMjMuMTc3MSAyMy4zODU0IDIzLjkwNjIgMjIuNjU2MkMyNC42MzU0IDIxLjkyNzEgMjUgMjEuMDQxNyAyNSAyMEMyNSAxOC45NTgzIDI0LjYzNTQgMTguMDcyOSAyMy45MDYyIDE3LjM0MzdDMjMuMTc3MSAxNi42MTQ2IDIyLjI5MTcgMTYuMjUgMjEuMjUgMTYuMjVDMjAuODMzMyAxNi4yNSAyMC40NDc5IDE2LjMwNzMgMjAuMDkzNyAxNi40MjE5QzE5LjczOTYgMTYuNTM2NSAxOS40MDYyIDE2LjcwODMgMTkuMDkzNyAxNi45Mzc1TDE1LjI4MTIgMTAuNTkzN0MxNC44NDM3IDEwLjUxMDQgMTQuNDc5MiAxMC4zMDIxIDE0LjE4NzUgOS45Njg3NUMxMy44OTU4IDkuNjM1NDIgMTMuNzUgOS4yMjkxNyAxMy43NSA4Ljc1QzEzLjc1IDguMjI5MTcgMTMuOTMyMyA3Ljc4NjQ2IDE0LjI5NjkgNy40MjE4N0MxNC42NjE1IDcuMDU3MjkgMTUuMTA0MiA2Ljg3NSAxNS42MjUgNi44NzVDMTYuMTQ1OCA2Ljg3NSAxNi41ODg1IDcuMDU3MjkgMTYuOTUzMSA3LjQyMTg3QzE3LjMxNzcgNy43ODY0NiAxNy41IDguMjI5MTcgMTcuNSA4Ljc1VjkuMDE1NjJDMTcuNSA5LjA4ODU0IDE3LjQ3OTIgOS4xNzcwOCAxNy40Mzc1IDkuMjgxMjVMMjAuMTU2MiAxMy44NDM3QzIwLjMyMjkgMTMuODAyMSAyMC41IDEzLjc3NiAyMC42ODc1IDEzLjc2NTZDMjAuODc1IDEzLjc1NTIgMjEuMDYyNSAxMy43NSAyMS4yNSAxMy43NUMyMi45NzkyIDEzLjc1IDI0LjQ1MzEgMTQuMzU5NCAyNS42NzE5IDE1LjU3ODFDMjYuODkwNiAxNi43OTY5IDI3LjUgMTguMjcwOCAyNy41IDIwQzI3LjUgMjEuNzI5MiAyNi44OTA2IDIzLjIwMzEgMjUuNjcxOSAyNC40MjE5QzI0LjQ1MzEgMjUuNjQwNiAyMi45NzkyIDI2LjI1IDIxLjI1IDI2LjI1Wk04Ljc1IDIxLjg3NUM4LjIyOTE3IDIxLjg3NSA3Ljc4NjQ2IDIxLjY5MjcgNy40MjE4NyAyMS4zMjgxQzcuMDU3MjkgMjAuOTYzNSA2Ljg3NSAyMC41MjA4IDYuODc1IDIwQzYuODc1IDE5LjU0MTcgNy4wMjA4MyAxOS4xNDU4IDcuMzEyNSAxOC44MTI1QzcuNjA0MTcgMTguNDc5MiA3Ljk1ODMzIDE4LjI2MDQgOC4zNzUgMTguMTU2MkwxMS4zMTI1IDEzLjI4MTJDMTAuNzA4MyAxMi43MTg3IDEwLjIzNDQgMTIuMDQ2OSA5Ljg5MDYyIDExLjI2NTZDOS41NDY4NyAxMC40ODQ0IDkuMzc1IDkuNjQ1ODMgOS4zNzUgOC43NUM5LjM3NSA3LjAyMDgzIDkuOTg0MzcgNS41NDY4NyAxMS4yMDMxIDQuMzI4MTJDMTIuNDIxOSAzLjEwOTM3IDEzLjg5NTggMi41IDE1LjYyNSAyLjVDMTcuMzU0MiAyLjUgMTguODI4MSAzLjEwOTM3IDIwLjA0NjkgNC4zMjgxMkMyMS4yNjU2IDUuNTQ2ODcgMjEuODc1IDcuMDIwODMgMjEuODc1IDguNzVIMTkuMzc1QzE5LjM3NSA3LjcwODMzIDE5LjAxMDQgNi44MjI5MiAxOC4yODEyIDYuMDkzNzVDMTcuNTUyMSA1LjM2NDU4IDE2LjY2NjcgNSAxNS42MjUgNUMxNC41ODMzIDUgMTMuNjk3OSA1LjM2NDU4IDEyLjk2ODcgNi4wOTM3NUMxMi4yMzk2IDYuODIyOTIgMTEuODc1IDcuNzA4MzMgMTEuODc1IDguNzVDMTEuODc1IDkuNjQ1ODMgMTIuMTQ1OCAxMC40MzIzIDEyLjY4NzUgMTEuMTA5NEMxMy4yMjkyIDExLjc4NjUgMTMuOTE2NyAxMi4yMTg3IDE0Ljc1IDEyLjQwNjJMMTAuNTMxMiAxOS40Mzc1QzEwLjU3MjkgMTkuNTQxNyAxMC41OTkgMTkuNjM1NCAxMC42MDk0IDE5LjcxODdDMTAuNjE5OCAxOS44MDIxIDEwLjYyNSAxOS44OTU4IDEwLjYyNSAyMEMxMC42MjUgMjAuNTIwOCAxMC40NDI3IDIwLjk2MzUgMTAuMDc4MSAyMS4zMjgxQzkuNzEzNTQgMjEuNjkyNyA5LjI3MDgzIDIxLjg3NSA4Ljc1IDIxLjg3NVoiIGZpbGw9IiNEQzAwRDEiLz48L2c+PC9zdmc+" width="54" height="54" alt="Webhook">
+              </div>
+              <div class="node-text">
+                <span class="node-label">Webhook</span>
+                <span class="node-desc">HTTP callback integration</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="np-category">
+          <div class="np-cat-header">
+            <span class="np-cat-name">End with</span>
+            <span class="np-cat-tag">required</span>
+          </div>
+          <div class="np-cat-items">
+            <div class="node-card">
+              <div class="node-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCA1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjU0Ij48Y2lyY2xlIGN4PSIyNyIgY3k9IjI3IiByPSIyNiIgZmlsbD0iI0U1RjhGQiIgc3Ryb2tlPSIjMDBCRkRDIiBzdHJva2Utd2lkdGg9IjIiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNCwxNSkgc2NhbGUoMSkiPjxwYXRoIGQ9Ik0xOC42Njc4IDE4LjY2NDdMMjUuMzM0NSAxMS45OThMMTguNjY3OCA1LjMzMTM0TDE2Ljc4NzggNy4yMTEzNEwyMC4yMjc4IDEwLjY2NDdIOC4wMDExNVYxMy4zMzEzSDIwLjIyNzhMMTYuNzg3OCAxNi43ODQ3TDE4LjY2NzggMTguNjY0N1oiIGZpbGw9IiMwMEJGREMiLz48cGF0aCBkPSJNMjEuMzMzMyAyMS4zMzMzSDIuNjY2NjdWMi42NjY2N0gyMS4zMzMzVjUuMzMzMzNIMjRWMi42NjY2N0MyNCAxLjIgMjIuODEzMyAwIDIxLjMzMzMgMEgyLjY2NjY3QzEuMiAwIDAgMS4yIDAgMi42NjY2N1YyMS4zMzMzQzAgMjIuOCAxLjIgMjQgMi42NjY2NyAyNEgyMS4zMzMzQzIyLjgxMzMgMjQgMjQgMjIuOCAyNCAyMS4zMzMzVjE4LjY2NjdIMjEuMzMzM1YyMS4zMzMzWiIgZmlsbD0iIzAwQkZEQyIvPjwvZz48L3N2Zz4=" width="54" height="54" alt="Output Endpoint">
+              </div>
+              <div class="node-text">
+                <span class="node-label">Output Endpoint</span>
+                <span class="node-desc">Send data to external system</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="np-ai-btn" onclick="document.getElementById('aiOverlay').classList.add('open')">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 7.5L18 10L12.5 12.5L10 18L7.5 12.5L2 10L7.5 7.5L10 2Z" fill="white"/></svg>
+          BUILD WITH AI
+        </button>
+      </div>
+      <div class="np-toggle" id="npToggleV2" onclick="toggleNodesPanel()">
+        <svg class="np-toggle-default" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 19C4.30556 19 3.71528 18.7569 3.22917 18.2708C2.74306 17.7847 2.5 17.1944 2.5 16.5C2.5 15.8056 2.74306 15.2153 3.22917 14.7292C3.71528 14.2431 4.30556 14 5 14C5.19444 14 5.38928 14.0247 5.58456 14.074C5.77969 14.1231 5.96681 14.1888 6.14583 14.2708L7.29167 12.8333C6.88889 12.4028 6.59375 11.9132 6.40625 11.3646C6.21875 10.816 6.18056 10.25 6.29167 9.66667L4.70833 9.1875C4.5 9.59028 4.19444 9.90972 3.79167 10.1458C3.38889 10.3819 2.95833 10.5 2.5 10.5C1.80556 10.5 1.21528 10.2569 0.729167 9.77083C0.243056 9.28472 0 8.69444 0 8C0 7.29167 0.239583 6.69792 0.71875 6.21875C1.19792 5.73958 1.79167 5.5 2.5 5.5C3.20833 5.5 3.80208 5.73958 4.28125 6.21875C4.76042 6.69792 5 7.29167 5 8V8.22917L6.58333 8.70833C6.86111 8.125 7.25694 7.63889 7.77083 7.25C8.28472 6.86111 8.86111 6.61806 9.5 6.52083V4.95833C8.91667 4.84722 8.4375 4.5625 8.0625 4.10417C7.6875 3.64583 7.5 3.11111 7.5 2.5C7.5 1.80556 7.74306 1.21528 8.22917 0.729167C8.71528 0.243056 9.30556 0 10 0C10.6944 0 11.2847 0.243056 11.7708 0.729167C12.2569 1.21528 12.5 1.80556 12.5 2.5C12.5 3.11111 12.3125 3.64583 11.9375 4.10417C11.5625 4.5625 11.0833 4.84722 10.5 4.95833V6.52017C11.1528 6.60397 11.7326 6.84028 12.2396 7.22917C12.7465 7.61806 13.1389 8.11111 13.4167 8.70833L15 8.22917V8C15 7.30556 15.2431 6.71528 15.7292 6.22917C16.2153 5.74306 16.8056 5.5 17.5 5.5C18.1944 5.5 18.7847 5.74306 19.2708 6.22917C19.7569 6.71528 20 7.30556 20 8C20 8.69444 19.7569 9.28472 19.2708 9.77083C18.7847 10.2569 18.1944 10.5 17.5 10.5C17.0417 10.5 16.6111 10.3854 16.2083 10.1562C15.8056 9.92708 15.5 9.60417 15.2917 9.1875L13.7083 9.66667C13.8194 10.25 13.7812 10.816 13.5938 11.3646C13.4062 11.9132 13.1111 12.4028 12.7083 12.8333L13.8542 14.2708C14.0347 14.1875 14.2222 14.1215 14.4167 14.0729C14.6111 14.0243 14.8056 14 15 14C15.6944 14 16.2847 14.2431 16.7708 14.7292C17.2569 15.2153 17.5 15.8056 17.5 16.5C17.5 17.1944 17.2569 17.7847 16.7708 18.2708C16.2847 18.7569 15.6944 19 15 19C14.3056 19 13.7153 18.7569 13.2292 18.2708C12.7431 17.7847 12.5 17.1944 12.5 16.5C12.5 16.2083 12.5521 15.9271 12.6562 15.6562C12.7604 15.3854 12.9028 15.1319 13.0833 14.8958L11.9375 13.4792C11.3403 13.8403 10.6944 14.0208 10 14.0208C9.30556 14.0208 8.65972 13.8403 8.0625 13.4792L6.91667 14.8958C7.09722 15.1319 7.23958 15.3852 7.34375 15.6556C7.44792 15.9262 7.5 16.2076 7.5 16.5C7.5 17.1944 7.25694 17.7847 6.77083 18.2708C6.28472 18.7569 5.69444 19 5 19ZM2.5 9C2.78333 9 3.02083 8.90417 3.2125 8.7125C3.40417 8.52083 3.5 8.28333 3.5 8C3.5 7.71667 3.40417 7.47917 3.2125 7.2875C3.02083 7.09583 2.78333 7 2.5 7C2.21667 7 1.97917 7.09583 1.7875 7.2875C1.59583 7.47917 1.5 7.71667 1.5 8C1.5 8.28333 1.59583 8.52083 1.7875 8.7125C1.97917 8.90417 2.21667 9 2.5 9ZM5 17.5C5.28333 17.5 5.52083 17.4042 5.7125 17.2125C5.90417 17.0208 6 16.7833 6 16.5C6 16.2167 5.90417 15.9792 5.7125 15.7875C5.52083 15.5958 5.28333 15.5 5 15.5C4.71667 15.5 4.47917 15.5958 4.2875 15.7875C4.09583 15.9792 4 16.2167 4 16.5C4 16.7833 4.09583 17.0208 4.2875 17.2125C4.47917 17.4042 4.71667 17.5 5 17.5ZM10 3.5C10.2833 3.5 10.5208 3.40417 10.7125 3.2125C10.9042 3.02083 11 2.78333 11 2.5C11 2.21667 10.9042 1.97917 10.7125 1.7875C10.5208 1.59583 10.2833 1.5 10 1.5C9.71667 1.5 9.47917 1.59583 9.2875 1.7875C9.09583 1.97917 9 2.21667 9 2.5C9 2.78333 9.09583 3.02083 9.2875 3.2125C9.47917 3.40417 9.71667 3.5 10 3.5ZM10 12.5C10.63 12.5 11.1625 12.2825 11.5975 11.8475C12.0325 11.4125 12.25 10.88 12.25 10.25C12.25 9.62 12.0325 9.0875 11.5975 8.6525C11.1625 8.2175 10.63 8 10 8C9.37 8 8.8375 8.2175 8.4025 8.6525C7.9675 9.0875 7.75 9.62 7.75 10.25C7.75 10.88 7.9675 11.4125 8.4025 11.8475C8.8375 12.2825 9.37 12.5 10 12.5ZM15 17.5C15.2833 17.5 15.5208 17.4042 15.7125 17.2125C15.9042 17.0208 16 16.7833 16 16.5C16 16.2167 15.9042 15.9792 15.7125 15.7875C15.5208 15.5958 15.2833 15.5 15 15.5C14.7167 15.5 14.4792 15.5958 14.2875 15.7875C14.0958 15.9792 14 16.2167 14 16.5C14 16.7833 14.0958 17.0208 14.2875 17.2125C14.4792 17.4042 14.7167 17.5 15 17.5ZM17.5 9C17.7833 9 18.0208 8.90417 18.2125 8.7125C18.4042 8.52083 18.5 8.28333 18.5 8C18.5 7.71667 18.4042 7.47917 18.2125 7.2875C18.0208 7.09583 17.7833 7 17.5 7C17.2167 7 16.9792 7.09583 16.7875 7.2875C16.5958 7.47917 16.5 7.71667 16.5 8C16.5 8.28333 16.5958 8.52083 16.7875 8.7125C16.9792 8.90417 17.2167 9 17.5 9Z" fill="black" fill-opacity="0.4"/></svg>
+        <svg class="np-toggle-hover" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.6 6.1V13.9L14.8 10L10.6 6.1ZM3.275 18.4C2.81433 18.4 2.42 18.236 2.092 17.908C1.764 17.58 1.6 17.1857 1.6 16.725V3.275C1.6 2.81433 1.764 2.42 2.092 2.092C2.42 1.764 2.81433 1.6 3.275 1.6H16.725C17.1857 1.6 17.58 1.764 17.908 2.092C18.236 2.42 18.4 2.81433 18.4 3.275V16.725C18.4 17.1857 18.236 17.58 17.908 17.908C17.58 18.236 17.1857 18.4 16.725 18.4H3.275ZM6.4 16.6V3.4H3.4V16.6H6.4ZM8.2 16.6H16.6V3.4H8.2V16.6Z" fill="black" fill-opacity="0.4"/></svg>
+      </div>
+    </div>
     <div class="canvas-onboarding" id="canvasOnboarding">
       <p class="onb-hint">Drag any node from the left panel &mdash; placeholders will disappear once you start</p>
       <div class="onb-flow" id="onbFlow">
@@ -708,7 +862,7 @@
         <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="proto-menu" id="protoMenu">
           <div class="proto-menu-item active" data-proto="1">Prototype 1.0</div>
-          <div class="proto-menu-item" data-proto="2">Prototype 2.0 <span class="proto-badge">SOON</span></div>
+          <div class="proto-menu-item" data-proto="2">Prototype 2.0</div>
         </div>
       </div>
       <div class="zoom-btns">
@@ -883,12 +1037,15 @@ function toggleSidebar() {
 }
 
 function toggleNodesPanel() {
-  document.getElementById('nodesPanel').classList.toggle('collapsed');
+  var v1 = document.getElementById('nodesPanel');
+  var v2 = document.getElementById('nodesPanelV2');
+  var active = (v2 && v2.style.display !== 'none') ? v2 : v1;
+  active.classList.toggle('collapsed');
 }
 
 (function() {
   var iconMap = {};
-  document.querySelectorAll('.node-card').forEach(function(card) {
+  document.querySelectorAll('#nodesPanel .node-card').forEach(function(card) {
     var label = card.querySelector('.node-label').textContent.trim();
     var img = card.querySelector('.node-icon img');
     iconMap[label] = img.src;
@@ -1008,7 +1165,7 @@ function toggleNodesPanel() {
   };
 
   var cardData = {};
-  document.querySelectorAll('.node-card').forEach(function(card) {
+  document.getElementById('nodesPanel').querySelectorAll('.node-card').forEach(function(card) {
     var label = card.querySelector('.node-label').textContent.trim();
     var iconEl = card.querySelector('.node-icon');
     var img = iconEl.querySelector('img');
@@ -1018,6 +1175,17 @@ function toggleNodesPanel() {
       imgH: img.getAttribute('height') || '20'
     };
   });
+  // Add v2 shaped icon sources from the v2 panel
+  var v2Panel = document.getElementById('nodesPanelV2');
+  if (v2Panel) {
+    v2Panel.querySelectorAll('.node-card').forEach(function(card) {
+      var label = card.querySelector('.node-label').textContent.trim();
+      var img = card.querySelector('.node-icon img');
+      if (img && cardData[label]) {
+        cardData[label].v2src = img.src;
+      }
+    });
+  }
 
   function plusSvg() {
     return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#949494" stroke-width="1.3"/><line x1="5.5" y1="9" x2="12.5" y2="9" stroke="#949494" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="5.5" x2="9" y2="12.5" stroke="#949494" stroke-width="1.5" stroke-linecap="round"/></svg>';
@@ -1030,6 +1198,9 @@ function toggleNodesPanel() {
   }
   function elseSvg() {
     return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#F44336" stroke-width="1.3"/><line x1="6.2" y1="6.2" x2="11.8" y2="11.8" stroke="#F44336" stroke-width="1.5" stroke-linecap="round"/><line x1="11.8" y1="6.2" x2="6.2" y2="11.8" stroke="#F44336" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  }
+  function arrowDownSvg() {
+    return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#949494" stroke-width="1.3"/><path d="M8.778 4.337L7.996 5.12L11.093 8.222H4.338V9.332H11.093L7.996 12.435L8.778 13.218L13.219 8.777L8.778 4.337Z" fill="#949494" transform="rotate(90 9 9)"/></svg>';
   }
 
   var nodes = [];
@@ -1056,16 +1227,27 @@ function toggleNodesPanel() {
     el.style.left = x + 'px';
     el.style.top = y + 'px';
 
+    var label = 'New ' + type;
     var html = '';
     if (cfg.left === 'arrow') html += arrowSvg();
-    html += '<div class="cn-body" style="border-color:' + cfg.border + '">';
+    if (currentProto === '2') {
+      html += '<div class="cn-body">';
+    } else {
+      html += '<div class="cn-body" style="border-color:' + cfg.border + '">';
+    }
     html += '<div class="cn-actions">';
     html += '<button class="cn-act-btn cn-delete-btn"><svg viewBox="0 0 20 20" fill="none"><path d="M4.5 16C4.0875 16 3.73437 15.8531 3.44062 15.5594C3.14687 15.2656 3 14.9125 3 14.5V4.5H2V3H6V2H10V3H14V4.5H13V14.491C13 14.9137 12.8531 15.2708 12.5594 15.5625C12.2656 15.8542 11.9125 16 11.5 16H4.5ZM11.5 4.5H4.5V14.5H11.5V4.5ZM6 13H7.5V6H6V13ZM8.5 13H10V6H8.5V13Z" fill="currentColor"/></svg>Delete</button>';
     html += '<button class="cn-act-btn cn-edit-btn"><svg viewBox="0 0 20 20" fill="none"><path d="M4.5 16H5.6L12.675 8.925L11.575 7.825L4.5 14.9V16ZM16.85 7.85L12.65 3.65L13.7 2.6C13.9833 2.31667 14.3333 2.175 14.75 2.175C15.1667 2.175 15.5167 2.31667 15.8 2.6L17.9 4.7C18.1833 4.98333 18.325 5.33333 18.325 5.75C18.325 6.16667 18.1833 6.51667 17.9 6.8L16.85 7.85ZM3.5 18C3.2 18 2.95833 17.9042 2.775 17.7125C2.59167 17.5208 2.5 17.2833 2.5 17V14.525C2.5 14.375 2.525 14.2333 2.575 14.1C2.625 13.9667 2.7 13.8417 2.8 13.725L11.575 4.95L15.55 8.925L6.775 17.7C6.65833 17.8 6.53333 17.875 6.4 17.925C6.26667 17.975 6.125 18 5.975 18H3.5Z" fill="currentColor"/></svg>Edit</button>';
     html += '</div>';
-    html += '<div class="cn-icon"' + (data.bg ? ' style="background:' + data.bg + '"' : '') + '>';
-    html += '<img src="' + data.src + '" width="' + data.imgW + '" height="' + data.imgH + '">';
-    html += '</div><span class="cn-label">New ' + type + '</span></div>';
+    if (currentProto === '2') {
+      html += '<img class="cn-shape-icon" src="' + (data.v2src || data.src) + '" width="54" height="54">';
+      html += '<span class="cn-label">' + label + '</span>';
+    } else {
+      html += '<div class="cn-icon"' + (data.bg ? ' style="background:' + data.bg + '"' : '') + '>';
+      html += '<img src="' + data.src + '" width="' + data.imgW + '" height="' + data.imgH + '">';
+      html += '</div><span class="cn-label">' + label + '</span>';
+    }
+    html += '</div>';
     if (cfg.right === 'plus') html += plusSvg();
     else if (cfg.right === 'logic') html += '<div class="cn-conn-group">' + thenSvg() + elseSvg() + '</div>';
 
@@ -1155,8 +1337,13 @@ function toggleNodesPanel() {
 
       dragGhost = document.createElement('div');
       dragGhost.className = 'drag-ghost';
-      var bgStyle = iconEl.style.background ? ' style="background:' + iconEl.style.background + '"' : '';
-      dragGhost.innerHTML = '<div class="dg-icon"' + bgStyle + '><img src="' + img.src + '" width="' + (img.getAttribute('width') || '20') + '" height="' + (img.getAttribute('height') || '20') + '"></div><span class="dg-label">' + label + '</span>';
+      var isV2 = card.closest('.v2-panel') !== null;
+      if (isV2) {
+        dragGhost.innerHTML = '<div class="dg-icon"><img src="' + img.src + '" width="54" height="54"></div><span class="dg-label">' + label + '</span>';
+      } else {
+        var bgStyle = iconEl.style.background ? ' style="background:' + iconEl.style.background + '"' : '';
+        dragGhost.innerHTML = '<div class="dg-icon"' + bgStyle + '><img src="' + img.src + '" width="' + (img.getAttribute('width') || '20') + '" height="' + (img.getAttribute('height') || '20') + '"></div><span class="dg-label">' + label + '</span>';
+      }
       document.body.appendChild(dragGhost);
       dragGhost.style.left = (e.clientX - 40) + 'px';
       dragGhost.style.top = (e.clientY - 20) + 'px';
@@ -1173,7 +1360,8 @@ function toggleNodesPanel() {
   window.addEventListener('mouseup', function(e) {
     if (!dragGhost) return;
     var canvasRect = canvas.getBoundingClientRect();
-    var panelEl = document.querySelector('.np-body');
+    var activePanelEl = (nodesPanelV2 && nodesPanelV2.style.display !== 'none') ? nodesPanelV2 : document.getElementById('nodesPanel');
+    var panelEl = activePanelEl ? activePanelEl.querySelector('.np-body') : null;
     var panelRect = panelEl ? panelEl.getBoundingClientRect() : { left: 0, right: 0, top: 0, bottom: 0 };
     var isOnPanel = e.clientX >= panelRect.left && e.clientX <= panelRect.right && e.clientY >= panelRect.top && e.clientY <= panelRect.bottom;
     var isOnCanvas = e.clientX >= canvasRect.left && e.clientX <= canvasRect.right && e.clientY >= canvasRect.top && e.clientY <= canvasRect.bottom;
@@ -1199,11 +1387,16 @@ function toggleNodesPanel() {
     var dx = Math.abs(x2 - x1) * 0.5;
     return 'M ' + x1 + ' ' + y1 + ' C ' + (x1 + dx) + ' ' + y1 + ' ' + (x2 - dx) + ' ' + y2 + ' ' + x2 + ' ' + y2;
   }
+  function verticalBezier(x1, y1, x2, y2) {
+    var dy = Math.abs(y2 - y1) * 0.5;
+    return 'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + (y1 + dy) + ' ' + x2 + ' ' + (y2 - dy) + ' ' + x2 + ' ' + y2;
+  }
 
   function updateConnections() {
     connections.forEach(function(c) {
       var f = getConnCenter(c.fromEl), t = getConnCenter(c.toEl);
-      c.path.setAttribute('d', bezier(f.x, f.y, t.x, t.y));
+      var b = c.vertical ? verticalBezier : bezier;
+      c.path.setAttribute('d', b(f.x, f.y, t.x, t.y));
     });
   }
 
@@ -1233,7 +1426,7 @@ function toggleNodesPanel() {
     tempLine.setAttribute('stroke-width', '2');
     tempLine.setAttribute('fill', 'none');
     connSvg.appendChild(tempLine);
-    connStart = { el: connEl, x: pos.x, y: pos.y, nodeEl: nodeEl, color: color };
+    connStart = { el: connEl, x: pos.x, y: pos.y, nodeEl: nodeEl, color: color, vertical: nodeEl.classList.contains('vertical') };
     e.stopPropagation();
     e.preventDefault();
   });
@@ -1241,7 +1434,8 @@ function toggleNodesPanel() {
   window.addEventListener('mousemove', function(e) {
     if (!tempLine) return;
     var pt = screenToFlow(e.clientX, e.clientY);
-    tempLine.setAttribute('d', bezier(connStart.x, connStart.y, pt.x, pt.y));
+    var bfn = connStart.vertical ? verticalBezier : bezier;
+    tempLine.setAttribute('d', bfn(connStart.x, connStart.y, pt.x, pt.y));
   });
 
   window.addEventListener('mouseup', function(e) {
@@ -1261,9 +1455,10 @@ function toggleNodesPanel() {
           path.setAttribute('stroke', connStart.color);
           path.setAttribute('stroke-width', '2');
           path.setAttribute('fill', 'none');
-          path.setAttribute('d', bezier(connStart.x, connStart.y, toPos.x, toPos.y));
+          var bfn2 = connStart.vertical ? verticalBezier : bezier;
+          path.setAttribute('d', bfn2(connStart.x, connStart.y, toPos.x, toPos.y));
           connSvg.appendChild(path);
-          connections.push({ fromEl: connStart.el, toEl: connEl, path: path });
+          connections.push({ fromEl: connStart.el, toEl: connEl, path: path, vertical: connStart.vertical });
         }
       }
     }
@@ -1322,6 +1517,99 @@ function toggleNodesPanel() {
     path.setAttribute('d', bezier(f.x, f.y, t.x, t.y));
     connSvg.appendChild(path);
     connections.push({ fromEl: fromEl, toEl: toEl, path: path });
+  }
+
+  function addVerticalConnection(fromEl, toEl, color) {
+    var f = getConnCenter(fromEl), t = getConnCenter(toEl);
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('stroke', color || '#949494');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('d', verticalBezier(f.x, f.y, t.x, t.y));
+    connSvg.appendChild(path);
+    connections.push({ fromEl: fromEl, toEl: toEl, path: path, vertical: true });
+  }
+
+  function createVerticalCanvasNode(type, x, y) {
+    var cfg = NODE_TYPES[type];
+    var data = cardData[type];
+    if (!cfg || !data) return null;
+
+    var id = 'node_' + (nodeIdCounter++);
+    var el = document.createElement('div');
+    el.className = 'canvas-node vertical';
+    el.setAttribute('data-type', type);
+    el.setAttribute('data-id', id);
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    var html = '';
+    if (cfg.left === 'arrow') html += arrowDownSvg();
+    html += '<div class="cn-body">';
+    html += '<div class="cn-actions">';
+    html += '<button class="cn-act-btn cn-delete-btn"><svg viewBox="0 0 20 20" fill="none"><path d="M4.5 16C4.0875 16 3.73437 15.8531 3.44062 15.5594C3.14687 15.2656 3 14.9125 3 14.5V4.5H2V3H6V2H10V3H14V4.5H13V14.491C13 14.9137 12.8531 15.2708 12.5594 15.5625C12.2656 15.8542 11.9125 16 11.5 16H4.5ZM11.5 4.5H4.5V14.5H11.5V4.5ZM6 13H7.5V6H6V13ZM8.5 13H10V6H8.5V13Z" fill="currentColor"/></svg>Delete</button>';
+    html += '<button class="cn-act-btn cn-edit-btn"><svg viewBox="0 0 20 20" fill="none"><path d="M4.5 16H5.6L12.675 8.925L11.575 7.825L4.5 14.9V16ZM16.85 7.85L12.65 3.65L13.7 2.6C13.9833 2.31667 14.3333 2.175 14.75 2.175C15.1667 2.175 15.5167 2.31667 15.8 2.6L17.9 4.7C18.1833 4.98333 18.325 5.33333 18.325 5.75C18.325 6.16667 18.1833 6.51667 17.9 6.8L16.85 7.85ZM3.5 18C3.2 18 2.95833 17.9042 2.775 17.7125C2.59167 17.5208 2.5 17.2833 2.5 17V14.525C2.5 14.375 2.525 14.2333 2.575 14.1C2.625 13.9667 2.7 13.8417 2.8 13.725L11.575 4.95L15.55 8.925L6.775 17.7C6.65833 17.8 6.53333 17.875 6.4 17.925C6.26667 17.975 6.125 18 5.975 18H3.5Z" fill="currentColor"/></svg>Edit</button>';
+    html += '</div>';
+    html += '<img class="cn-shape-icon" src="' + (data.v2src || data.src) + '" width="54" height="54">';
+    html += '<span class="cn-label">New ' + type + '</span>';
+    html += '</div>';
+    if (cfg.right === 'plus') html += plusSvg();
+    else if (cfg.right === 'logic') html += '<div class="cn-conn-group">' + thenSvg() + elseSvg() + '</div>';
+
+    el.innerHTML = html;
+    flowLayer.appendChild(el);
+
+    var nodeObj = { id: id, type: type, el: el, x: x, y: y };
+    nodes.push(nodeObj);
+    enableNodeDrag(el, nodeObj);
+
+    el.querySelector('.cn-delete-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      connections = connections.filter(function(c) {
+        var fromNode = c.fromEl.closest('.canvas-node');
+        var toNode = c.toEl.closest('.canvas-node');
+        if (fromNode === el || toNode === el) {
+          c.path.remove();
+          return false;
+        }
+        return true;
+      });
+      nodes = nodes.filter(function(n) { return n.id !== nodeObj.id; });
+      el.remove();
+    });
+
+    return nodeObj;
+  }
+
+  function loadVerticalTestFlow() {
+    clearCanvas();
+    if (onboarding) onboarding.style.display = 'none';
+
+    var ds = createVerticalCanvasNode('Data Source', 350, 50);
+    ds.el.querySelector('.cn-label').textContent = 'GPS Tracker';
+
+    var logic = createVerticalCanvasNode('IF/THEN Logic', 350, 280);
+    logic.el.querySelector('.cn-label').textContent = 'Speed > 80 km/h';
+
+    var action = createVerticalCanvasNode('Device Action', 250, 520);
+    action.el.querySelector('.cn-label').textContent = 'Send alert';
+
+    var endpoint = createVerticalCanvasNode('Output Endpoint', 550, 520);
+    endpoint.el.querySelector('.cn-label').textContent = 'Log to report';
+
+    setTimeout(function() {
+      var dsPlus = ds.el.querySelector('.cn-conn:last-child') || ds.el.querySelector('.cn-conn');
+      var logicArrow = logic.el.querySelector('.cn-conn');
+      var logicGroup = logic.el.querySelector('.cn-conn-group');
+      var logicThen = logicGroup.children[0];
+      var logicElse = logicGroup.children[1];
+      var actionArrow = action.el.querySelector('.cn-conn');
+      var epArrow = endpoint.el.querySelector('.cn-conn');
+
+      addVerticalConnection(dsPlus, logicArrow, '#949494');
+      addVerticalConnection(logicThen, actionArrow, '#4CAF50');
+      addVerticalConnection(logicElse, epArrow, '#F44336');
+    }, 50);
   }
 
   function loadQAFlow() {
@@ -1450,6 +1738,7 @@ function toggleNodesPanel() {
     flowMenu.classList.remove('open');
     if (flow === 'qa') loadQAFlow();
     else if (flow === 'antitheft') openTemplateModal();
+    else if (flow === 'vertical') loadVerticalTestFlow();
     else loadTestFlow();
   });
 
@@ -1464,16 +1753,44 @@ function toggleNodesPanel() {
   document.addEventListener('click', function() {
     protoMenu.classList.remove('open');
   });
+
+  var currentProto = '1';
+  var verticalFlowItem = document.getElementById('verticalFlowItem');
+  var horizontalFlowItems = flowMenu.querySelectorAll('.flow-menu-item:not([data-flow="vertical"])');
+  var nodesPanelV1 = document.getElementById('nodesPanel');
+  var nodesPanelV2 = document.getElementById('nodesPanelV2');
+  var canvasArea = document.getElementById('canvas');
+
+  function applyProtoSwitch(proto) {
+    currentProto = proto;
+    protoMenu.querySelectorAll('.proto-menu-item').forEach(function(i) { i.classList.remove('active'); });
+    protoMenu.querySelector('[data-proto="' + proto + '"]').classList.add('active');
+    protoDropdown.firstChild.textContent = (proto === '2' ? 'Prototype 2.0' : 'Prototype 1.0') + ' ';
+    protoMenu.classList.remove('open');
+    if (proto === '2') {
+      verticalFlowItem.style.display = '';
+      horizontalFlowItems.forEach(function(i) { i.style.display = 'none'; });
+      nodesPanelV1.style.display = 'none';
+      if (nodesPanelV2) nodesPanelV2.style.display = '';
+      if (canvasArea) canvasArea.classList.add('v2-canvas');
+      if (currentFlow !== 'vertical') verticalFlowItem.click();
+    } else {
+      verticalFlowItem.style.display = 'none';
+      horizontalFlowItems.forEach(function(i) { i.style.display = ''; });
+      nodesPanelV1.style.display = '';
+      if (nodesPanelV2) nodesPanelV2.style.display = 'none';
+      if (canvasArea) canvasArea.classList.remove('v2-canvas');
+      if (currentFlow === 'vertical') {
+        document.querySelector('.flow-menu-item[data-flow="test"]').click();
+      }
+    }
+  }
   protoMenu.addEventListener('click', function(e) {
     var item = e.target.closest('.proto-menu-item');
     if (!item) return;
-    if (item.getAttribute('data-proto') === '2') {
-      protoMenu.classList.remove('open');
-      return;
-    }
-    protoMenu.querySelectorAll('.proto-menu-item').forEach(function(i) { i.classList.remove('active'); });
-    item.classList.add('active');
-    protoMenu.classList.remove('open');
+    var proto = item.getAttribute('data-proto');
+    if (proto === currentProto) { protoMenu.classList.remove('open'); return; }
+    applyProtoSwitch(proto);
   });
 })();
 </script>
