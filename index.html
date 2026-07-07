@@ -1044,9 +1044,26 @@ function toggleNodesPanel() {
   var flow = document.getElementById('onbFlow');
   if (!flow) return;
 
+  var ghostViewBoxFix = {
+    'Device Action': '4.5 4.5 21 21',
+    'Output Endpoint': '-2.1 -2.5 21 21'
+  };
+  function cleanGhostSvg(dataUrl, key) {
+    if (!dataUrl) return dataUrl;
+    try {
+      var b64 = dataUrl.split(',')[1];
+      var svg = atob(b64);
+      svg = svg.replace(/<rect[^>]*fill-opacity="0\.1"[^>]*\/>/g, '');
+      if (ghostViewBoxFix[key]) {
+        svg = svg.replace(/viewBox="[^"]*"/, 'viewBox="' + ghostViewBoxFix[key] + '"');
+      }
+      return 'data:image/svg+xml;base64,' + btoa(svg);
+    } catch(e) { return dataUrl; }
+  }
+
   var els = [];
   ghosts.forEach(function(g) {
-    var src = iconMap[g.key] || '';
+    var src = cleanGhostSvg(iconMap[g.key] || '', g.key);
     var n = document.createElement('div');
     n.className = 'ghost-node';
     n.style.cssText = 'left:' + g.x + 'px;top:' + g.y + 'px';
