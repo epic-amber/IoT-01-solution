@@ -226,9 +226,9 @@
   .onb-hint {
     font-size: 14px; font-weight: 500; line-height: 24px;
     color: #757575; text-align: center; max-width: 420px;
-    margin-bottom: 20px; transform: scale(1.2);
+    margin-bottom: -36px; transform: scale(1.2);
   }
-  .onb-flow { position: relative; width: 660px; height: 320px; transform: scale(1.2); transform-origin: top center; margin-bottom: 64px; }
+  .onb-flow { position: relative; width: 660px; height: 320px; transform: scale(1.2); transform-origin: top center; margin-bottom: -8px; }
   .onb-lines { position: absolute; inset: 0; overflow: visible; z-index: 2; pointer-events: none; }
   .ghost-node {
     position: absolute;
@@ -830,28 +830,7 @@
     <div class="canvas-onboarding" id="canvasOnboarding">
       <p class="onb-hint">Drag any node from the left panel &mdash; placeholders will disappear once you start</p>
       <div class="onb-flow" id="onbFlow">
-        <svg class="onb-lines" viewBox="0 0 660 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 155 154 C 188 154 188 69 220 69" stroke="#DEDEDE" stroke-width="1.3"/>
-          <path d="M 155 154 C 195 154 195 244 235 244" stroke="#DEDEDE" stroke-width="1.3"/>
-          <path d="M 347 59 C 389 59 389 24 430 24" stroke="#DEDEDE" stroke-width="1.3"/>
-          <path d="M 347 79 C 391 79 391 164 435 164" stroke="#DEDEDE" stroke-width="1.3"/>
-          <!-- Data Source RIGHT: plus (output) -->
-          <g transform="translate(155,154)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><line x1="-3.5" y1="0" x2="3.5" y2="0" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/><line x1="0" y1="-3.5" x2="0" y2="3.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/></g>
-          <!-- Logic LEFT: arrow (input) -->
-          <g transform="translate(220,69)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><path d="M-0.222 -4.663L-1.004 -3.88L2.093 -0.778H-4.662V0.332H2.093L-1.004 3.435L-0.222 4.218L4.219 -0.223Z" fill="#DEDEDE"/></g>
-          <!-- Logic RIGHT-upper: then (checkmark) -->
-          <g transform="translate(347,59)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><path d="M-3 0L-0.5 2.5L3.5 -2" stroke="#BDBDBD" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
-          <!-- Logic RIGHT-lower: else (X) -->
-          <g transform="translate(347,79)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/><line x1="2.5" y1="-2.5" x2="-2.5" y2="2.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/></g>
-          <!-- Initial attrs LEFT: arrow (input) -->
-          <g transform="translate(430,24)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><path d="M-0.222 -4.663L-1.004 -3.88L2.093 -0.778H-4.662V0.332H2.093L-1.004 3.435L-0.222 4.218L4.219 -0.223Z" fill="#DEDEDE"/></g>
-          <!-- Output Endpoint LEFT: arrow (input) -->
-          <g transform="translate(435,164)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><path d="M-0.222 -4.663L-1.004 -3.88L2.093 -0.778H-4.662V0.332H2.093L-1.004 3.435L-0.222 4.218L4.219 -0.223Z" fill="#DEDEDE"/></g>
-          <!-- Webhook LEFT: arrow (input) -->
-          <g transform="translate(235,244)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><path d="M-0.222 -4.663L-1.004 -3.88L2.093 -0.778H-4.662V0.332H2.093L-1.004 3.435L-0.222 4.218L4.219 -0.223Z" fill="#DEDEDE"/></g>
-          <!-- Initial attrs RIGHT: plus (output) -->
-          <g transform="translate(617,24)"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/><line x1="-3.5" y1="0" x2="3.5" y2="0" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/><line x1="0" y1="-3.5" x2="0" y2="3.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/></g>
-        </svg>
+        <svg class="onb-lines" viewBox="0 0 660 320" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
       <p class="onb-or">or</p>
       <button class="onb-ai-btn">Build with AI</button>
@@ -1050,15 +1029,22 @@ function toggleNodesPanel() {
     var img = card.querySelector('.node-icon img');
     iconMap[label] = img.src;
   });
+
+  var CONN_GAP = 0;
+  var DESC_GAP = 6;
+  var DESC_W = 210;
+
   var ghosts = [
-    { label: 'Data Source node', key: 'Data Source', x: -12, y: 130, dx: -12, dy: 182, desc: 'Required starting point.' },
-    { label: 'Logic node', key: 'IF/THEN Logic', x: 220, y: 45, dx: 184, dy: 97, desc: 'Splits the flow into THEN / ELSE<br>branches based on a condition.' },
-    { label: 'Initial attributes node', key: 'Initial attributes', x: 430, y: 0, dx: 415, dy: 52, desc: 'Creates or transforms attributes<br>with a formula' },
-    { label: 'Output Endpoint node', key: 'Output Endpoint', x: 435, y: 140, dx: 423, dy: 192, desc: 'Required endpoint &mdash; without it,<br>data won&rsquo;t reach Navixy.' },
-    { label: 'Webhook node', key: 'Webhook', x: 235, y: 220, dx: 203, dy: 272, desc: 'Sends an HTTP POST with custom<br>JSON to an external URL.' }
+    { label: 'Data Source node', key: 'Data Source', x: 10, y: 130, desc: 'Required starting point.' },
+    { label: 'Object left geofence', key: 'IF/THEN Logic', x: 235, y: 130, desc: 'Splits the flow into THEN / ELSE<br>branches based on a condition.' },
+    { label: 'Block the engine', key: 'Device Action', x: 485, y: 45, desc: 'Sends a command back<br>to the device' },
+    { label: 'Send to tracking', key: 'Output Endpoint', x: 485, y: 215, desc: 'Required endpoint &mdash; without it,<br>data won&rsquo;t reach Navixy.' }
   ];
+
   var flow = document.getElementById('onbFlow');
   if (!flow) return;
+
+  var els = [];
   ghosts.forEach(function(g) {
     var src = iconMap[g.key] || '';
     var n = document.createElement('div');
@@ -1066,11 +1052,58 @@ function toggleNodesPanel() {
     n.style.cssText = 'left:' + g.x + 'px;top:' + g.y + 'px';
     n.innerHTML = '<div class="gn-icon"><img src="' + src + '" width="20" height="20"></div><span class="gn-label">' + g.label + '</span>';
     flow.appendChild(n);
-    var d = document.createElement('p');
-    d.className = 'gn-desc';
-    d.style.cssText = 'left:' + g.dx + 'px;top:' + g.dy + 'px';
-    d.innerHTML = g.desc;
-    flow.appendChild(d);
+    els.push(n);
+  });
+
+  requestAnimationFrame(function() {
+    var svg = flow.querySelector('.onb-lines');
+    if (!svg) return;
+
+    var r = els.map(function(el, i) {
+      return { x: ghosts[i].x, y: ghosts[i].y, w: el.offsetWidth, h: el.offsetHeight };
+    });
+
+    function midY(n) { return n.y + n.h / 2; }
+
+    var dsPlus    = { x: r[0].x + r[0].w + CONN_GAP, y: midY(r[0]) };
+    var logicIn   = { x: r[1].x - CONN_GAP,          y: midY(r[1]) };
+    var BRANCH_INSET = 7;
+    var logicThen = { x: r[1].x + r[1].w - BRANCH_INSET + CONN_GAP, y: r[1].y + r[1].h * 0.04 };
+    var logicElse = { x: r[1].x + r[1].w - BRANCH_INSET + CONN_GAP, y: r[1].y + r[1].h * 0.91 };
+    var actionIn  = { x: r[2].x - CONN_GAP,          y: midY(r[2]) };
+    var outputIn  = { x: r[3].x - CONN_GAP,          y: midY(r[3]) };
+
+    var PLUS  = '<line x1="-3.5" y1="0" x2="3.5" y2="0" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/><line x1="0" y1="-3.5" x2="0" y2="3.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/>';
+    var ARROW = '<path d="M-0.222 -4.663L-1.004 -3.88L2.093 -0.778H-4.662V0.332H2.093L-1.004 3.435L-0.222 4.218L4.219 -0.223Z" fill="#BDBDBD"/>';
+    var CHECK = '<path d="M-3 0L-0.5 2.5L3.5 -2" stroke="#BDBDBD" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+    var CROSS = '<line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/><line x1="2.5" y1="-2.5" x2="-2.5" y2="2.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/>';
+
+    function conn(p, icon) {
+      return '<g transform="translate(' + p.x + ',' + p.y + ')"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/>' + icon + '</g>';
+    }
+    function bez(a, b) {
+      var mx = (a.x + b.x) / 2;
+      return '<path d="M ' + a.x + ' ' + a.y + ' C ' + mx + ' ' + a.y + ' ' + mx + ' ' + b.y + ' ' + b.x + ' ' + b.y + '" stroke="#DEDEDE" stroke-width="1.3"/>';
+    }
+
+    svg.innerHTML =
+      bez(dsPlus, logicIn) +
+      bez(logicThen, actionIn) +
+      bez(logicElse, outputIn) +
+      conn(dsPlus, PLUS) +
+      conn(logicIn, ARROW) +
+      conn(logicThen, CHECK) +
+      conn(logicElse, CROSS) +
+      conn(actionIn, ARROW) +
+      conn(outputIn, ARROW);
+
+    r.forEach(function(n, i) {
+      var d = document.createElement('p');
+      d.className = 'gn-desc';
+      d.style.cssText = 'left:' + (n.x + n.w / 2 - DESC_W / 2) + 'px;top:' + (n.y + n.h + DESC_GAP) + 'px';
+      d.innerHTML = ghosts[i].desc;
+      flow.appendChild(d);
+    });
   });
 })();
 
