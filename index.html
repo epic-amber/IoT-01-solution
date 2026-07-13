@@ -216,6 +216,17 @@
   .node-drag { width: 24px; height: 24px; flex-shrink: 0; opacity: 0.6; }
   .node-drag img { display: block; width: 24px; height: 24px; }
 
+  .node-tooltip {
+    position: fixed; z-index: 9999; pointer-events: none;
+    background: rgba(0,0,0,0.8); color: #fff; border-radius: 4px;
+    padding: 8px; font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px; font-weight: 400; line-height: 20px;
+    letter-spacing: 0.25px; white-space: pre-line;
+    max-width: 320px;
+    opacity: 0; transition: opacity 0.15s ease;
+  }
+  .node-tooltip.visible { opacity: 1; }
+
   /* ── Canvas Onboarding ── */
   .canvas-onboarding {
     position: absolute; inset: 0;
@@ -248,11 +259,11 @@
     position: absolute; font-size: 12px; font-weight: 400;
     color: #9E9E9E; line-height: 16px; text-align: center; width: 210px;
   }
-  .onb-or { font-size: 14px; font-weight: 500; color: #757575; line-height: 24px; margin: 8px 0; }
+  .onb-or { font-size: 17px; font-weight: 500; color: #757575; line-height: 24px; margin: 72px 0 16px; }
   .onb-ai-btn {
     background: #3296DC; color: white; border: none; border-radius: 4px;
-    padding: 6px 8px; font-size: 14px; font-weight: 500; line-height: 20px;
-    width: 156px; cursor: pointer; font-family: var(--font); text-align: center;
+    padding: 8px 16px; font-size: 17px; font-weight: 500; line-height: 20px;
+    cursor: pointer; font-family: var(--font); text-align: center;
   }
   .onb-ai-btn:hover { background: #2a86cc; }
 
@@ -492,36 +503,66 @@
   }
   .cn-act-btn:hover { color: #212121; }
   .cn-act-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .cn-body-wrap {
+    display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+    position: relative;
+  }
+  .cn-body-wrap .cn-warning,
+  .cn-body-wrap .cn-error {
+    position: absolute; top: 100%; margin-top: 8px;
+    width: max-content; left: 50%; transform: translateX(-50%);
+  }
   .cn-warning {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 500; color: #F9A825;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 12px; font-weight: 400; color: #F9A825;
     background: #FFF8E1; border: 1px solid #F9A825; border-radius: 4px;
-    padding: 4px 10px; margin-top: 6px; white-space: nowrap;
+    padding: 5px 10px; height: 29px; box-sizing: border-box;
+    white-space: nowrap; font-family: 'Inter', 'Roboto', Arial, sans-serif;
   }
   .cn-warning svg { flex-shrink: 0; }
+  .cn-error {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 12px; font-weight: 400; color: #F44336;
+    background: #FFEBEE; border: 1px solid #F44336; border-radius: 4px;
+    padding: 5px 10px; height: 29px; box-sizing: border-box;
+    white-space: nowrap; font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  }
+  .cn-error svg { flex-shrink: 0; }
   .cn-body {
     display: flex; align-items: center; gap: 8px;
     padding: 8px 12px; background: #fff; border: 1.5px solid #DEDEDE;
-    border-radius: 4px; white-space: nowrap;
+    border-radius: 4px;
     transition: border-color 0.15s;
-    max-width: 280px;
+    width: 180px; box-sizing: border-box;
   }
   .cn-icon {
     width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
   }
   .cn-icon img { display: block; }
-  .cn-label { font-size: 12px; font-weight: 500; line-height: 16px; color: #000; overflow: hidden; text-overflow: ellipsis; }
+  .cn-label {
+    font-size: 12px; font-weight: 500; line-height: 1.2; color: #000;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; word-break: break-word;
+  }
   .cn-conn {
     width: 18px; height: 18px; flex-shrink: 0; cursor: crosshair;
     margin: 0 -8px; position: relative; z-index: 2;
   }
   .cn-body { position: relative; z-index: 1; }
   .cn-conn-group {
-    display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;
-    margin: 0 -8px; position: relative; z-index: 2;
+    position: relative; z-index: 2; flex-shrink: 0;
+    align-self: stretch; width: 18px; margin-left: -9px; margin-right: 0;
   }
-  .cn-conn-group .cn-conn { margin: 0; }
+  .cn-conn-group .cn-conn {
+    margin: 0; position: absolute; left: 0;
+  }
+  .cn-conn-group .cn-conn:first-child {
+    top: 30%; transform: translateY(-50%);
+  }
+  .cn-conn-group .cn-conn:last-child {
+    top: 70%; transform: translateY(-50%);
+  }
   .drag-ghost {
     position: fixed; pointer-events: none; z-index: 1000;
     display: flex; align-items: center; gap: 8px;
@@ -560,8 +601,13 @@
 
   .canvas-node.vertical { flex-direction: column; align-items: center; transform-origin: center top; }
   .canvas-node.vertical .cn-conn { margin: -8px 0; }
-  .canvas-node.vertical .cn-conn-group { flex-direction: row; gap: 8px; margin: -8px 0; }
-  .canvas-node.vertical .cn-conn-group .cn-conn { margin: 0; }
+  .canvas-node.vertical .cn-conn-group {
+    display: flex; flex-direction: row; gap: 8px; margin: -8px 0;
+    align-self: auto; width: auto; margin-left: 0; margin-right: 0;
+  }
+  .canvas-node.vertical .cn-conn-group .cn-conn {
+    margin: 0; position: static; transform: none;
+  }
 
   .cn-shape-icon { width: 54px; height: 54px; flex-shrink: 0; display: block; }
 
@@ -621,6 +667,9 @@
             <div class="flow-menu-item" data-flow="qa">QA edited</div>
             <div class="flow-menu-item" data-flow="antitheft">Anti-theft protection</div>
             <div class="flow-menu-item" data-flow="vertical" id="verticalFlowItem" style="display:none">Vertical test flow</div>
+            <div class="flow-menu-item" data-flow="superlarge">SuperLarge Flow</div>
+            <div class="flow-menu-item" data-flow="status">Status</div>
+            <div class="flow-menu-item" data-flow="longnames">Fuel theft detection</div>
           </div>
         </div>
         <div class="more-btn">
@@ -832,8 +881,8 @@
       <div class="onb-flow" id="onbFlow">
         <svg class="onb-lines" viewBox="0 0 660 320" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
-      <p class="onb-or">or</p>
-      <button class="onb-ai-btn">Build with AI</button>
+      <p class="onb-or">or describe your use case — AI drafts a flow you can import and edit.</p>
+      <button class="onb-ai-btn">Draft flow with AI</button>
     </div>
     <div class="canvas-controls">
       <div class="proto-dropdown" id="protoDropdown">
@@ -1084,9 +1133,9 @@ function toggleNodesPanel() {
 
     var dsPlus    = { x: r[0].x + r[0].w + CONN_GAP, y: midY(r[0]) };
     var logicIn   = { x: r[1].x - CONN_GAP,          y: midY(r[1]) };
-    var BRANCH_INSET = 7;
-    var logicThen = { x: r[1].x + r[1].w - BRANCH_INSET + CONN_GAP, y: r[1].y + r[1].h * 0.04 };
-    var logicElse = { x: r[1].x + r[1].w - BRANCH_INSET + CONN_GAP, y: r[1].y + r[1].h * 0.91 };
+    var BRANCH_INSET = 0;
+    var logicThen = { x: r[1].x + r[1].w - BRANCH_INSET + CONN_GAP, y: r[1].y + r[1].h * 0.30 };
+    var logicElse = { x: r[1].x + r[1].w - BRANCH_INSET + CONN_GAP, y: r[1].y + r[1].h * 0.70 };
     var actionIn  = { x: r[2].x - CONN_GAP,          y: midY(r[2]) };
     var outputIn  = { x: r[3].x - CONN_GAP,          y: midY(r[3]) };
 
@@ -1098,21 +1147,46 @@ function toggleNodesPanel() {
     function conn(p, icon) {
       return '<g transform="translate(' + p.x + ',' + p.y + ')"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/>' + icon + '</g>';
     }
-    function bez(a, b) {
+    function bez(a, b, label) {
       var mx = (a.x + b.x) / 2;
-      return '<path d="M ' + a.x + ' ' + a.y + ' C ' + mx + ' ' + a.y + ' ' + mx + ' ' + b.y + ' ' + b.x + ' ' + b.y + '" stroke="#DEDEDE" stroke-width="1.3"/>';
+      var d = 'M ' + a.x + ' ' + a.y + ' C ' + mx + ' ' + a.y + ' ' + mx + ' ' + b.y + ' ' + b.x + ' ' + b.y;
+      if (label) {
+        return '<path data-label="' + label + '" d="' + d + '" stroke="#DEDEDE" stroke-width="1.3" fill="none"/>';
+      }
+      return '<path d="' + d + '" stroke="#DEDEDE" stroke-width="1.3" fill="none"/>';
     }
 
     svg.innerHTML =
       bez(dsPlus, logicIn) +
-      bez(logicThen, actionIn) +
-      bez(logicElse, outputIn) +
+      bez(logicThen, actionIn, 'then') +
+      bez(logicElse, outputIn, 'else') +
       conn(dsPlus, PLUS) +
       conn(logicIn, ARROW) +
       conn(logicThen, CHECK) +
       conn(logicElse, CROSS) +
       conn(actionIn, ARROW) +
       conn(outputIn, ARROW);
+
+    svg.querySelectorAll('path[data-label]').forEach(function(p) {
+      var lbl = p.getAttribute('data-label');
+      var L = p.getTotalLength();
+      var mid = p.getPointAtLength(L / 2);
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', mid.x);
+      t.setAttribute('y', mid.y);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('dominant-baseline', 'central');
+      t.setAttribute('font-size', '12');
+      t.setAttribute('font-weight', '500');
+      t.setAttribute('fill', '#9E9E9E');
+      t.setAttribute('font-family', 'Roboto,sans-serif');
+      t.textContent = lbl;
+      svg.appendChild(t);
+      var bbox = t.getBBox();
+      var gap = bbox.width + 12;
+      var dash = Math.max(0, (L - gap) / 2);
+      p.setAttribute('stroke-dasharray', dash + ' ' + gap);
+    });
 
     r.forEach(function(n, i) {
       var d = document.createElement('p');
@@ -1315,6 +1389,7 @@ function toggleNodesPanel() {
         var toNode = c.toEl.closest('.canvas-node');
         if (fromNode === el || toNode === el) {
           c.path.remove();
+          if (c.textEl) c.textEl.remove();
           return false;
         }
         return true;
@@ -1324,6 +1399,30 @@ function toggleNodesPanel() {
     });
 
     return nodeObj;
+  }
+
+  function addNodeStatus(nodeObj, type) {
+    var body = nodeObj.el.querySelector('.cn-body');
+    var wrap = document.createElement('div');
+    wrap.className = 'cn-body-wrap';
+    body.parentNode.insertBefore(wrap, body);
+    wrap.appendChild(body);
+
+    if (type === 'warning') {
+      body.style.borderColor = '#F9A825';
+      body.style.borderWidth = '2px';
+      var el = document.createElement('div');
+      el.className = 'cn-warning';
+      el.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="#F9A825"/><text x="8" y="12" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">!</text></svg> See warning details';
+      wrap.appendChild(el);
+    } else if (type === 'error') {
+      body.style.borderColor = '#F44336';
+      body.style.borderWidth = '2px';
+      var el = document.createElement('div');
+      el.className = 'cn-error';
+      el.innerHTML = '<svg viewBox="0 0 18 18" width="14" height="14"><circle cx="9" cy="9" r="8" fill="none" stroke="#F44336" stroke-width="2"/><line x1="4.5" y1="4.5" x2="13.5" y2="13.5" stroke="#F44336" stroke-width="2" stroke-linecap="round"/></svg> See error details';
+      wrap.appendChild(el);
+    }
   }
 
   var activeNode = null;
@@ -1398,6 +1497,49 @@ function toggleNodesPanel() {
       dragGhost.style.left = (e.clientX - 40) + 'px';
       dragGhost.style.top = (e.clientY - 20) + 'px';
       e.preventDefault();
+      hideNodeTooltip();
+    });
+  });
+
+  var TOOLTIP_DATA = {
+    'Data Source': 'Selects which devices feed data.\ne.g. GPS trackers, sensors, dashcams.\nRequired · every flow starts here.',
+    'IF/THEN Logic': 'Splits the flow based on a condition.\ne.g. speed > 100 → alert, ELSE continue.\nUndefined values go to ELSE.',
+    'Initial attributes': 'Creates new values from raw data.\ne.g. convert °C → °F, compute avg speed.\nOptional · place between nodes.',
+    'Device Action': 'Sends a command back to the device.\ne.g. lock, unlock, engine block.\nTerminal · nothing connects after.',
+    'Webhook': 'Sends HTTP POST to external service.\ne.g. Slack alert, CRM, Zapier trigger.\nTerminal · nothing connects after.',
+    'Output Endpoint': 'Sends data to Navixy or external system.\ne.g. Default endpoint, MQTT stream.\nRequired · data won\'t reach Navixy without it.'
+  };
+
+  var tooltipEl = document.createElement('div');
+  tooltipEl.className = 'node-tooltip';
+  document.body.appendChild(tooltipEl);
+  var tooltipTimer = null;
+
+  function showNodeTooltip(card, label) {
+    var text = TOOLTIP_DATA[label];
+    if (!text) return;
+    tooltipEl.textContent = text;
+    var rect = card.getBoundingClientRect();
+    tooltipEl.style.left = (rect.right + 8) + 'px';
+    tooltipEl.style.top = rect.top + 'px';
+    tooltipEl.classList.add('visible');
+  }
+
+  function hideNodeTooltip() {
+    clearTimeout(tooltipTimer);
+    tooltipTimer = null;
+    tooltipEl.classList.remove('visible');
+  }
+
+  document.querySelectorAll('.node-card').forEach(function(card) {
+    card.addEventListener('mouseenter', function() {
+      var label = card.querySelector('.node-label').textContent.trim();
+      tooltipTimer = setTimeout(function() {
+        if (!dragGhost) showNodeTooltip(card, label);
+      }, 500);
+    });
+    card.addEventListener('mouseleave', function() {
+      hideNodeTooltip();
     });
   });
 
@@ -1447,6 +1589,9 @@ function toggleNodesPanel() {
       var f = getConnCenter(c.fromEl), t = getConnCenter(c.toEl);
       var b = c.vertical ? verticalBezier : bezier;
       c.path.setAttribute('d', b(f.x, f.y, t.x, t.y));
+      if (c.textEl && c.label) {
+        applyDashLabel(c.path, c.textEl);
+      }
     });
   }
 
@@ -1500,15 +1645,17 @@ function toggleNodesPanel() {
         var connIdx = siblings.indexOf(connEl);
         var bodyIdx = siblings.indexOf(body);
         if (connIdx < bodyIdx) {
-          var toPos = getConnCenter(connEl);
-          var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          path.setAttribute('stroke', connStart.color);
-          path.setAttribute('stroke-width', '2');
-          path.setAttribute('fill', 'none');
-          var bfn2 = connStart.vertical ? verticalBezier : bezier;
-          path.setAttribute('d', bfn2(connStart.x, connStart.y, toPos.x, toPos.y));
-          connSvg.appendChild(path);
-          connections.push({ fromEl: connStart.el, toEl: connEl, path: path, vertical: connStart.vertical });
+          var label = null;
+          var srcGroup = connStart.el.closest('.cn-conn-group');
+          if (srcGroup) {
+            var srcIdx = Array.from(srcGroup.children).indexOf(connStart.el);
+            label = srcIdx === 0 ? 'then' : 'else';
+          }
+          if (connStart.vertical) {
+            addVerticalConnection(connStart.el, connEl, connStart.color, label);
+          } else {
+            addConnection(connStart.el, connEl, connStart.color, label);
+          }
         }
       }
     }
@@ -1552,32 +1699,71 @@ function toggleNodesPanel() {
   function clearCanvas() {
     nodes.forEach(function(n) { n.el.remove(); });
     nodes = [];
-    connections.forEach(function(c) { c.path.remove(); });
+    connections.forEach(function(c) { c.path.remove(); if (c.textEl) c.textEl.remove(); });
     connections = [];
     nodeIdCounter = 0;
     setActiveNode(null);
   }
 
-  function addConnection(fromEl, toEl, color) {
-    var f = getConnCenter(fromEl), t = getConnCenter(toEl);
-    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('stroke', color || '#949494');
-    path.setAttribute('stroke-width', '2');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('d', bezier(f.x, f.y, t.x, t.y));
-    connSvg.appendChild(path);
-    connections.push({ fromEl: fromEl, toEl: toEl, path: path });
+  function applyDashLabel(path, textEl) {
+    var L = path.getTotalLength();
+    var mid = path.getPointAtLength(L / 2);
+    textEl.setAttribute('x', mid.x);
+    textEl.setAttribute('y', mid.y);
+    var bbox = textEl.getBBox();
+    var gap = bbox.width + 12;
+    var dash = Math.max(0, (L - gap) / 2);
+    path.setAttribute('stroke-dasharray', dash + ' ' + gap);
   }
 
-  function addVerticalConnection(fromEl, toEl, color) {
+  function addConnection(fromEl, toEl, color, label) {
     var f = getConnCenter(fromEl), t = getConnCenter(toEl);
     var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('stroke', color || '#949494');
     path.setAttribute('stroke-width', '2');
     path.setAttribute('fill', 'none');
-    path.setAttribute('d', verticalBezier(f.x, f.y, t.x, t.y));
+    var d = bezier(f.x, f.y, t.x, t.y);
+    path.setAttribute('d', d);
     connSvg.appendChild(path);
-    connections.push({ fromEl: fromEl, toEl: toEl, path: path, vertical: true });
+    var textEl = null;
+    if (label) {
+      textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textEl.setAttribute('text-anchor', 'middle');
+      textEl.setAttribute('dominant-baseline', 'central');
+      textEl.setAttribute('font-size', '12');
+      textEl.setAttribute('font-weight', '500');
+      textEl.setAttribute('fill', '#212121');
+      textEl.setAttribute('font-family', 'Roboto,sans-serif');
+      textEl.textContent = label;
+      connSvg.appendChild(textEl);
+      applyDashLabel(path, textEl);
+    }
+    connections.push({ fromEl: fromEl, toEl: toEl, path: path, textEl: textEl, label: label });
+  }
+
+  function addVerticalConnection(fromEl, toEl, color, label) {
+    var f = getConnCenter(fromEl), t = getConnCenter(toEl);
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('stroke', color || '#949494');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    var d = verticalBezier(f.x, f.y, t.x, t.y);
+    path.setAttribute('d', d);
+    connSvg.appendChild(path);
+    var textEl = null;
+    if (label) {
+      textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textEl.setAttribute('text-anchor', 'middle');
+      textEl.setAttribute('dominant-baseline', 'central');
+      textEl.setAttribute('font-size', '12');
+      textEl.setAttribute('font-weight', '500');
+      textEl.setAttribute('fill', '#212121');
+      textEl.setAttribute('font-family', 'Roboto,sans-serif');
+      textEl.textContent = label;
+      connSvg.appendChild(textEl);
+      applyDashLabel(path, textEl);
+    }
+    connections.push({ fromEl: fromEl, toEl: toEl, path: path, vertical: true, textEl: textEl, label: label });
   }
 
   function createVerticalCanvasNode(type, x, y) {
@@ -1620,6 +1806,7 @@ function toggleNodesPanel() {
         var toNode = c.toEl.closest('.canvas-node');
         if (fromNode === el || toNode === el) {
           c.path.remove();
+          if (c.textEl) c.textEl.remove();
           return false;
         }
         return true;
@@ -1657,8 +1844,8 @@ function toggleNodesPanel() {
       var epArrow = endpoint.el.querySelector('.cn-conn');
 
       addVerticalConnection(dsPlus, logicArrow, '#949494');
-      addVerticalConnection(logicThen, actionArrow, '#4CAF50');
-      addVerticalConnection(logicElse, epArrow, '#F44336');
+      addVerticalConnection(logicThen, actionArrow, '#4CAF50', 'then');
+      addVerticalConnection(logicElse, epArrow, '#F44336', 'else');
     }, 50);
   }
 
@@ -1692,10 +1879,10 @@ function toggleNodesPanel() {
 
       addConnection(dsPlus, l1Arrow, '#949494');
       addConnection(dsPlus, l2Arrow, '#949494');
-      addConnection(l1Then, a1Arrow, '#4CAF50');
-      addConnection(l1Else, a2Arrow, '#F44336');
-      addConnection(l2Then, epArrow, '#4CAF50');
-      addConnection(l2Else, epArrow, '#F44336');
+      addConnection(l1Then, a1Arrow, '#4CAF50', 'then');
+      addConnection(l1Else, a2Arrow, '#F44336', 'else');
+      addConnection(l2Then, epArrow, '#4CAF50', 'then');
+      addConnection(l2Else, epArrow, '#F44336', 'else');
     }, 50);
   }
 
@@ -1710,12 +1897,7 @@ function toggleNodesPanel() {
 
     var ds = createCanvasNode('Data Source', 300, 300);
     ds.el.querySelector('.cn-label').textContent = 'New Data Source';
-    ds.el.querySelector('.cn-body').style.borderColor = '#F9A825';
-    ds.el.querySelector('.cn-body').style.borderWidth = '2px';
-    var warn = document.createElement('div');
-    warn.className = 'cn-warning';
-    warn.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="#F9A825"/><text x="8" y="12" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">!</text></svg> See warning details';
-    ds.el.appendChild(warn);
+    addNodeStatus(ds, 'warning');
 
     var logic = createCanvasNode('IF/THEN Logic', 600, 270);
     logic.el.querySelector('.cn-label').textContent = 'Object left geofence';
@@ -1736,9 +1918,196 @@ function toggleNodesPanel() {
       var epArrow = endpoint.el.querySelector('.cn-conn');
 
       addConnection(dsPlus, logicArrow, '#949494');
-      addConnection(logicThen, actionArrow, '#4CAF50');
-      addConnection(logicThen, epArrow, '#4CAF50');
-      addConnection(logicElse, epArrow, '#F44336');
+      addConnection(logicThen, actionArrow, '#4CAF50', 'then');
+      addConnection(logicThen, epArrow, '#4CAF50', 'then');
+      addConnection(logicElse, epArrow, '#F44336', 'else');
+    }, 50);
+  }
+
+  function loadSuperLargeFlow() {
+    clearCanvas();
+    if (onboarding) onboarding.style.display = 'none';
+
+    var nodeDefs = [
+      { id: 1, type: 'Data Source', x: 50, y: 440, label: 'New Data Source', warn: true },
+      { id: 2, type: 'IF/THEN Logic', x: 330, y: 440, label: 'New Logic Node' },
+      { id: 20, type: 'IF/THEN Logic', x: 610, y: 200, label: 'New Logic Node' },
+      { id: 21, type: 'IF/THEN Logic', x: 610, y: 680, label: 'New Logic Node' },
+      { id: 35, type: 'IF/THEN Logic', x: 890, y: 120, label: 'New Logic Node' },
+      { id: 22, type: 'IF/THEN Logic', x: 890, y: 280, label: 'New Logic Node' },
+      { id: 23, type: 'IF/THEN Logic', x: 890, y: 520, label: 'New Logic Node' },
+      { id: 27, type: 'IF/THEN Logic', x: 890, y: 840, label: 'New Logic Node' },
+      { id: 7, type: 'Device Action', x: 1170, y: 80, label: 'New Action Node' },
+      { id: 9, type: 'Device Action', x: 1170, y: 160, label: 'New Action Node' },
+      { id: 11, type: 'Device Action', x: 1170, y: 240, label: 'New Action Node' },
+      { id: 12, type: 'Device Action', x: 1170, y: 320, label: 'New Action Node' },
+      { id: 29, type: 'IF/THEN Logic', x: 1170, y: 440, label: 'New Logic Node' },
+      { id: 25, type: 'IF/THEN Logic', x: 1170, y: 600, label: 'New Logic Node' },
+      { id: 26, type: 'IF/THEN Logic', x: 1170, y: 760, label: 'New Logic Node' },
+      { id: 24, type: 'IF/THEN Logic', x: 1170, y: 920, label: 'New Logic Node' },
+      { id: 39, type: 'Initial attributes', x: 1450, y: 400, label: 'New Initiate Attribute' },
+      { id: 40, type: 'Initial attributes', x: 1450, y: 480, label: 'New Initiate Attribute' },
+      { id: 41, type: 'Initial attributes', x: 1450, y: 560, label: 'New Initiate Attribute' },
+      { id: 42, type: 'Initial attributes', x: 1450, y: 640, label: 'New Initiate Attribute' },
+      { id: 43, type: 'Initial attributes', x: 1450, y: 720, label: 'New Initiate Attribute' },
+      { id: 44, type: 'Initial attributes', x: 1450, y: 800, label: 'New Initiate Attribute' },
+      { id: 45, type: 'Initial attributes', x: 1450, y: 880, label: 'New Initiate Attribute' },
+      { id: 46, type: 'Initial attributes', x: 1450, y: 960, label: 'New Initiate Attribute' },
+      { id: 47, type: 'Output Endpoint', x: 2076, y: 680, label: 'Default Output Endpoint' }
+    ];
+
+    var edges = [
+      { from: 1, to: 2 },
+      { from: 2, to: 21, type: 'else_edge' },
+      { from: 2, to: 20, type: 'then_edge' },
+      { from: 2, to: 47, type: 'then_edge' },
+      { from: 20, to: 35, type: 'then_edge' },
+      { from: 20, to: 22, type: 'else_edge' },
+      { from: 35, to: 7, type: 'then_edge' },
+      { from: 35, to: 9, type: 'else_edge' },
+      { from: 22, to: 11, type: 'then_edge' },
+      { from: 22, to: 12, type: 'else_edge' },
+      { from: 21, to: 23, type: 'then_edge' },
+      { from: 21, to: 27, type: 'else_edge' },
+      { from: 27, to: 24, type: 'else_edge' },
+      { from: 27, to: 26, type: 'then_edge' },
+      { from: 23, to: 29, type: 'then_edge' },
+      { from: 23, to: 25, type: 'else_edge' },
+      { from: 29, to: 39, type: 'then_edge' },
+      { from: 29, to: 40, type: 'else_edge' },
+      { from: 25, to: 41, type: 'then_edge' },
+      { from: 25, to: 42, type: 'else_edge' },
+      { from: 26, to: 43, type: 'then_edge' },
+      { from: 26, to: 44, type: 'else_edge' },
+      { from: 24, to: 45, type: 'then_edge' },
+      { from: 24, to: 46, type: 'else_edge' },
+      { from: 39, to: 47 },
+      { from: 40, to: 47 },
+      { from: 41, to: 47 },
+      { from: 42, to: 47 },
+      { from: 43, to: 47 },
+      { from: 44, to: 47 },
+      { from: 45, to: 47 },
+      { from: 46, to: 47 }
+    ];
+
+    var nodeMap = {};
+    nodeDefs.forEach(function(def) {
+      var n = createCanvasNode(def.type, def.x, def.y);
+      n.el.querySelector('.cn-label').textContent = def.label;
+      if (def.warn) addNodeStatus(n, 'warning');
+      if (def.error) addNodeStatus(n, 'error');
+      nodeMap[def.id] = n;
+    });
+
+    setTimeout(function() {
+      edges.forEach(function(e) {
+        var fromNode = nodeMap[e.from];
+        var toNode = nodeMap[e.to];
+        if (!fromNode || !toNode) return;
+
+        var fromConn, color = '#949494', label = null;
+        if (e.type === 'then_edge') {
+          var g = fromNode.el.querySelector('.cn-conn-group');
+          fromConn = g ? g.children[0] : null;
+          color = '#4CAF50';
+          label = 'then';
+        } else if (e.type === 'else_edge') {
+          var g = fromNode.el.querySelector('.cn-conn-group');
+          fromConn = g ? g.children[1] : null;
+          color = '#F44336';
+          label = 'else';
+        } else {
+          var conns = fromNode.el.querySelectorAll('.cn-conn');
+          fromConn = conns[conns.length - 1];
+        }
+
+        var toConn = toNode.el.querySelector('.cn-conn');
+        if (fromConn && toConn) {
+          addConnection(fromConn, toConn, color, label);
+        }
+      });
+    }, 50);
+  }
+
+  function loadStatusFlow() {
+    clearCanvas();
+    if (onboarding) onboarding.style.display = 'none';
+
+    var ds = createCanvasNode('Data Source', 80, 300);
+    ds.el.querySelector('.cn-label').textContent = 'GPS Tracker Source';
+    addNodeStatus(ds, 'warning');
+
+    var logic = createCanvasNode('IF/THEN Logic', 380, 270);
+    logic.el.querySelector('.cn-label').textContent = 'Speed > 120 km/h';
+
+    var action = createCanvasNode('Device Action', 700, 140);
+    action.el.querySelector('.cn-label').textContent = 'Send alert SMS';
+
+    var webhook = createCanvasNode('Webhook', 700, 400);
+    webhook.el.querySelector('.cn-label').textContent = 'Notify dispatcher';
+    addNodeStatus(webhook, 'error');
+
+    var endpoint = createCanvasNode('Output Endpoint', 1020, 270);
+    endpoint.el.querySelector('.cn-label').textContent = 'Default Output Endpoint';
+
+    setTimeout(function() {
+      var dsPlus = ds.el.querySelector('.cn-conn');
+      var logicArrow = logic.el.querySelector('.cn-conn');
+      var logicGroup = logic.el.querySelector('.cn-conn-group');
+      var logicThen = logicGroup.children[0];
+      var logicElse = logicGroup.children[1];
+      var actionArrow = action.el.querySelector('.cn-conn');
+      var webhookArrow = webhook.el.querySelector('.cn-conn');
+      var epArrow = endpoint.el.querySelector('.cn-conn');
+
+      addConnection(dsPlus, logicArrow, '#949494');
+      addConnection(logicThen, actionArrow, '#4CAF50', 'then');
+      addConnection(logicElse, webhookArrow, '#F44336', 'else');
+      addConnection(actionArrow, epArrow, '#949494');
+    }, 50);
+  }
+
+  function loadLongNamesFlow() {
+    clearCanvas();
+    if (onboarding) onboarding.style.display = 'none';
+
+    var ds = createCanvasNode('Data Source', 80, 300);
+    ds.el.querySelector('.cn-label').textContent = 'Fuel Level & GPS Position Sensors Group A';
+
+    var logic = createCanvasNode('IF/THEN Logic', 400, 300);
+    logic.el.querySelector('.cn-label').textContent = 'Fuel drop > 10L within 5 minutes without ignition';
+
+    var initAttr = createCanvasNode('Initial attributes', 400, 120);
+    initAttr.el.querySelector('.cn-label').textContent = 'Calculate Total Fuel Loss Volume per Trip Segment';
+
+    var action = createCanvasNode('Device Action', 750, 120);
+    action.el.querySelector('.cn-label').textContent = 'Block Engine and Lock All Doors Immediately';
+
+    var webhook = createCanvasNode('Webhook', 750, 480);
+    webhook.el.querySelector('.cn-label').textContent = 'Send Alert to Security Department & Insurance Provider';
+    addNodeStatus(webhook, 'error');
+
+    var endpoint = createCanvasNode('Output Endpoint', 1100, 300);
+    endpoint.el.querySelector('.cn-label').textContent = 'Fleet Security Incident Report Dashboard Endpoint';
+
+    setTimeout(function() {
+      var dsPlus = ds.el.querySelector('.cn-conn');
+      var logicArrow = logic.el.querySelector('.cn-conn');
+      var logicGroup = logic.el.querySelector('.cn-conn-group');
+      var logicThen = logicGroup.children[0];
+      var logicElse = logicGroup.children[1];
+      var initArrow = initAttr.el.querySelector('.cn-conn');
+      var initPlus = initAttr.el.querySelector('.cn-conn:last-child') || initAttr.el.querySelectorAll('.cn-conn')[1];
+      var actionArrow = action.el.querySelector('.cn-conn');
+      var webhookArrow = webhook.el.querySelector('.cn-conn');
+      var epArrow = endpoint.el.querySelector('.cn-conn');
+
+      addConnection(dsPlus, logicArrow, '#949494');
+      addConnection(logicThen, actionArrow, '#4CAF50', 'then');
+      addConnection(logicElse, webhookArrow, '#F44336', 'else');
+      addConnection(actionArrow, epArrow, '#949494');
+      addConnection(initPlus, logicArrow, '#949494');
     }, 50);
   }
 
@@ -1789,6 +2158,9 @@ function toggleNodesPanel() {
     if (flow === 'qa') loadQAFlow();
     else if (flow === 'antitheft') openTemplateModal();
     else if (flow === 'vertical') loadVerticalTestFlow();
+    else if (flow === 'superlarge') loadSuperLargeFlow();
+    else if (flow === 'status') loadStatusFlow();
+    else if (flow === 'longnames') loadLongNamesFlow();
     else loadTestFlow();
   });
 
