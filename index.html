@@ -434,12 +434,11 @@
     box-shadow: 0 0 9px rgba(0,0,0,0.24); cursor: pointer;
     font-size: 11px; font-weight: 500; color: rgba(0,0,0,0.55);
     font-family: var(--font); gap: 4px; white-space: nowrap;
-    align-self: flex-end; margin-bottom: 2px;
   }
   .proto-dropdown:hover { background: #f5f5f5; }
   .proto-dropdown svg { width: 12px; height: 12px; flex-shrink: 0; }
   .proto-menu {
-    display: none; position: absolute; bottom: calc(100% + 4px); right: 0;
+    display: none; position: absolute; top: calc(100% + 4px); right: 0;
     background: #fff; border: 1px solid var(--border); border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 50; overflow: hidden;
     min-width: 140px;
@@ -459,7 +458,6 @@
     width: 28px; height: 28px; border: none; border-radius: 4px;
     background: #fff; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 9px rgba(0,0,0,0.24);
     padding: 0; color: rgba(0,0,0,0.55); font-family: var(--font);
   }
   .ctrl-btn:hover { background: #f5f5f5; }
@@ -468,12 +466,45 @@
   .ctrl-zoom {
     display: flex; flex-direction: column;
     border-radius: 4px; overflow: hidden;
-    box-shadow: 0 0 9px rgba(0,0,0,0.24);
   }
   .ctrl-zoom .ctrl-btn {
-    box-shadow: none; border-radius: 0;
+    border-radius: 0;
   }
   .ctrl-zoom .ctrl-btn:first-child { border-bottom: 1px solid #E0E0E0; }
+
+  /* ── Flow Blueprint panel (Figma 3471-27456) ── */
+  .fbp {
+    position: absolute; right: 77px; bottom: 33px; z-index: 10;
+    width: 240px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 4px;
+  }
+  .fbp-list { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+  .fbp.collapsed .fbp-list { display: none; }
+  .fbp-item { display: flex; gap: 12px; align-items: flex-start; }
+  .fbp-item.fbp-inactive { opacity: 0.5; }
+  .fbp-item-text { flex: 1; min-width: 0; word-break: break-word; }
+  .fbp-item-name {
+    font-family: 'Roboto', Arial, sans-serif; font-weight: 500;
+    font-size: 12px; line-height: 20px; letter-spacing: 0.03px; color: #000;
+  }
+  .fbp-item-desc {
+    font-family: 'Inter', 'Roboto', Arial, sans-serif; font-weight: 400;
+    font-size: 12px; line-height: normal; color: #6D6F70;
+  }
+  .fbp-item-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .fbp-item-icon svg { display: block; width: 100%; height: 100%; }
+  .fbp-header {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    cursor: pointer; user-select: none;
+  }
+  .fbp:not(.collapsed) .fbp-header { border-top: 1px solid var(--border); }
+  .fbp-header-label {
+    flex: 1; min-width: 0; word-break: break-word;
+    font-family: 'Roboto', Arial, sans-serif; font-weight: 500;
+    font-size: 14px; line-height: 22px; letter-spacing: 0.1px; color: #000;
+  }
+  .fbp-chevron { width: 18px; height: 18px; flex-shrink: 0; }
+  .fbp-chevron svg { display: block; width: 100%; height: 100%; }
 
   /* ── Flow Layer & Active Canvas Nodes ── */
   .flow-layer {
@@ -677,7 +708,17 @@
         </div>
       </div>
     </div>
-    <button class="save-btn">Save flow</button>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="proto-dropdown" id="protoDropdown">
+        Prototype 1.0
+        <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="proto-menu" id="protoMenu">
+          <div class="proto-menu-item active" data-proto="1">Prototype 1.0</div>
+          <div class="proto-menu-item" data-proto="2">Prototype 2.0</div>
+        </div>
+      </div>
+      <button class="save-btn">Save flow</button>
+    </div>
     <div class="mode-bar">
       <div class="mode-tab active">IoT Logic</div>
       <div class="mode-tab">Data Analyzer</div>
@@ -885,14 +926,6 @@
       <button class="onb-ai-btn">Draft flow with AI</button>
     </div>
     <div class="canvas-controls">
-      <div class="proto-dropdown" id="protoDropdown">
-        Prototype 1.0
-        <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div class="proto-menu" id="protoMenu">
-          <div class="proto-menu-item active" data-proto="1">Prototype 1.0</div>
-          <div class="proto-menu-item" data-proto="2">Prototype 2.0</div>
-        </div>
-      </div>
       <div class="zoom-btns">
         <button class="ctrl-btn" id="ctrlCenter" title="Center view">
           <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -919,6 +952,7 @@
         </div>
       </div>
     </div>
+    <div class="fbp collapsed" id="flowBlueprint" aria-label="Flow Blueprint"></div>
   </div>
 </div>
 
@@ -1219,7 +1253,7 @@ function toggleNodesPanel() {
   }
 
   canvas.addEventListener('mousedown', function(e) {
-    if (e.target.closest('.nodes-panel') || e.target.closest('.canvas-controls') || e.target.closest('.onb-ai-btn') || e.target.closest('.canvas-node')) return;
+    if (e.target.closest('.nodes-panel') || e.target.closest('.canvas-controls') || e.target.closest('.fbp') || e.target.closest('.onb-ai-btn') || e.target.closest('.canvas-node')) return;
     isPanning = true;
     startX = e.clientX - panX;
     startY = e.clientY - panY;
@@ -1380,6 +1414,7 @@ function toggleNodesPanel() {
 
     var nodeObj = { id: id, type: type, el: el, x: x, y: y };
     nodes.push(nodeObj);
+    updateFlowBlueprint();
     enableNodeDrag(el, nodeObj);
 
     el.querySelector('.cn-delete-btn').addEventListener('click', function(e) {
@@ -1396,6 +1431,7 @@ function toggleNodesPanel() {
       });
       nodes = nodes.filter(function(n) { return n.id !== nodeObj.id; });
       el.remove();
+      updateFlowBlueprint();
     });
 
     return nodeObj;
@@ -1699,6 +1735,7 @@ function toggleNodesPanel() {
   function clearCanvas() {
     nodes.forEach(function(n) { n.el.remove(); });
     nodes = [];
+    updateFlowBlueprint();
     connections.forEach(function(c) { c.path.remove(); if (c.textEl) c.textEl.remove(); });
     connections = [];
     nodeIdCounter = 0;
@@ -1797,6 +1834,7 @@ function toggleNodesPanel() {
 
     var nodeObj = { id: id, type: type, el: el, x: x, y: y };
     nodes.push(nodeObj);
+    updateFlowBlueprint();
     enableNodeDrag(el, nodeObj);
 
     el.querySelector('.cn-delete-btn').addEventListener('click', function(e) {
@@ -1813,6 +1851,7 @@ function toggleNodesPanel() {
       });
       nodes = nodes.filter(function(n) { return n.id !== nodeObj.id; });
       el.remove();
+      updateFlowBlueprint();
     });
 
     return nodeObj;
@@ -2214,5 +2253,77 @@ function toggleNodesPanel() {
     if (proto === currentProto) { protoMenu.classList.remove('open'); return; }
     applyProtoSwitch(proto);
   });
+
+  /* ── Flow Blueprint (Figma 3471-27456). Presentational: content + hasCheck come from the caller. ── */
+  var FBP_CHECK_PATH = 'M8.45 13.45L13.7375 8.1625L12.6875 7.1125L8.45 11.35L6.3125 9.2125L5.2625 10.2625L8.45 13.45ZM9.5 17.5C8.4625 17.5 7.4875 17.3031 6.575 16.9094C5.6625 16.5156 4.86875 15.9813 4.19375 15.3063C3.51875 14.6313 2.98438 13.8375 2.59063 12.925C2.19688 12.0125 2 11.0375 2 10C2 8.9625 2.19688 7.9875 2.59063 7.075C2.98438 6.1625 3.51875 5.36875 4.19375 4.69375C4.86875 4.01875 5.6625 3.48438 6.575 3.09063C7.4875 2.69688 8.4625 2.5 9.5 2.5C10.5375 2.5 11.5125 2.69688 12.425 3.09063C13.3375 3.48438 14.1313 4.01875 14.8063 4.69375C15.4813 5.36875 16.0156 6.1625 16.4094 7.075C16.8031 7.9875 17 8.9625 17 10C17 11.0375 16.8031 12.0125 16.4094 12.925C16.0156 13.8375 15.4813 14.6313 14.8063 15.3063C14.1313 15.9813 13.3375 16.5156 12.425 16.9094C11.5125 17.3031 10.5375 17.5 9.5 17.5ZM9.5 16C11.175 16 12.5938 15.4188 13.7563 14.2563C14.9188 13.0938 15.5 11.675 15.5 10C15.5 8.325 14.9188 6.90625 13.7563 5.74375C12.5938 4.58125 11.175 4 9.5 4C7.825 4 6.40625 4.58125 5.24375 5.74375C4.08125 6.90625 3.5 8.325 3.5 10C3.5 11.675 4.08125 13.0938 5.24375 14.2563C6.40625 15.4188 7.825 16 9.5 16Z';
+  var FBP_ICON_CHECK = '<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="' + FBP_CHECK_PATH + '" fill="var(--accent)"/></svg>';
+  var FBP_ICON_CIRCLE = '<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="' + FBP_CHECK_PATH + '" fill="#000" fill-opacity="0.13"/></svg>';
+  var FBP_ICON_UP = '<svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 8.1L5.55 11.55L4.5 10.5L9 6L13.5 10.5L12.45 11.55L9 8.1Z" fill="#000" fill-opacity="0.4"/></svg>';
+  var FBP_ICON_DOWN = '<svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 11.55L4.5 7.05L5.55 6L9 9.45L12.45 6L13.5 7.05L9 11.55Z" fill="#000" fill-opacity="0.4"/></svg>';
+
+  function renderFlowBlueprint(container, items) {
+    var expanded = localStorage.getItem('fbpExpanded') === '1';
+    var html = '<div class="fbp-list" role="list">';
+    items.forEach(function(it) {
+      html += '<div class="fbp-item' + (it.hasCheck ? '' : ' fbp-inactive') + '" role="listitem">' +
+        '<div class="fbp-item-text">' +
+          '<div class="fbp-item-name">' + it.name + '</div>' +
+          '<div class="fbp-item-desc">' + it.desc + '</div>' +
+        '</div>' +
+        '<span class="fbp-item-icon" role="img" aria-label="' + (it.hasCheck ? 'Added' : 'Not added yet') + '">' +
+          (it.hasCheck ? FBP_ICON_CHECK : FBP_ICON_CIRCLE) +
+        '</span></div>';
+    });
+    html += '</div>' +
+      '<div class="fbp-header" role="button" tabindex="0" aria-expanded="' + expanded + '">' +
+        '<span class="fbp-header-label">Flow Blueprint</span>' +
+        '<span class="fbp-chevron">' + (expanded ? FBP_ICON_DOWN : FBP_ICON_UP) + '</span>' +
+      '</div>';
+    container.innerHTML = html;
+    container.classList.toggle('collapsed', !expanded);
+    var header = container.querySelector('.fbp-header');
+    var chevron = container.querySelector('.fbp-chevron');
+    function fbpToggle() {
+      expanded = !expanded;
+      localStorage.setItem('fbpExpanded', expanded ? '1' : '0');
+      container.classList.toggle('collapsed', !expanded);
+      header.setAttribute('aria-expanded', String(expanded));
+      chevron.innerHTML = expanded ? FBP_ICON_DOWN : FBP_ICON_UP;
+    }
+    header.addEventListener('click', fbpToggle);
+    header.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fbpToggle(); }
+    });
+  }
+
+  /* Recompute hasCheck from the canvas nodes list. Called only where that list
+     mutates (node add / remove) — never on connections, renames or config edits. */
+  function updateFlowBlueprint() {
+    var rows = document.querySelectorAll('#flowBlueprint .fbp-item');
+    if (!rows.length) return;
+    FLOW_BLUEPRINT_ITEMS.forEach(function(it, i) {
+      var hasCheck = nodes.some(function(n) { return n.type === it.nodeType; });
+      if (hasCheck === it.hasCheck) return;
+      it.hasCheck = hasCheck;
+      var row = rows[i];
+      if (!row) return;
+      row.classList.toggle('fbp-inactive', !hasCheck);
+      var icon = row.querySelector('.fbp-item-icon');
+      icon.setAttribute('aria-label', hasCheck ? 'Added' : 'Not added yet');
+      icon.innerHTML = hasCheck ? FBP_ICON_CHECK : FBP_ICON_CIRCLE;
+    });
+  }
+
+  /* nodeType = exact NODE_TYPES key; hasCheck is computed from the canvas by updateFlowBlueprint() */
+  var FLOW_BLUEPRINT_ITEMS = [
+    { name: 'Data Source node', desc: 'Start point. Your devices feed data.', nodeType: 'Data Source', hasCheck: false },
+    { name: 'Initial attributes node', desc: 'Optional. Transforms data with a formula.', nodeType: 'Initial attributes', hasCheck: false },
+    { name: 'IF/THEN Logic node', desc: 'Optional. Splits flow into THEN / ELSE.', nodeType: 'IF/THEN Logic', hasCheck: false },
+    { name: 'Device Action node', desc: 'Action. Sends a command back to device.', nodeType: 'Device Action', hasCheck: false },
+    { name: 'Webhook node', desc: 'Action. HTTP POST to external service.', nodeType: 'Webhook', hasCheck: false },
+    { name: 'Output Endpoint', desc: 'End point. Data reaches Navixy.', nodeType: 'Output Endpoint', hasCheck: false }
+  ];
+  renderFlowBlueprint(document.getElementById('flowBlueprint'), FLOW_BLUEPRINT_ITEMS);
+  updateFlowBlueprint();
 })();
 </script>
