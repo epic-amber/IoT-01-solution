@@ -501,6 +501,14 @@
     border-top: none;
     border-bottom: 1px solid rgba(0,0,0,0.13);
   }
+  body.proto-v12 .fp {
+    position: absolute;
+    right: 77px;
+    bottom: 33px;
+    left: auto;
+    top: auto;
+    transform: none;
+  }
   .fp-body {
     display: flex; flex-direction: column; gap: 16px; padding: 16px;
     box-sizing: border-box; min-height: 324px;
@@ -811,6 +819,7 @@
         <div class="proto-menu" id="protoMenu">
           <div class="proto-menu-item active" data-proto="1">Prototype 1.0</div>
           <div class="proto-menu-item" data-proto="1.1">Prototype 1.1</div>
+          <div class="proto-menu-item" data-proto="1.2">Prototype 1.2</div>
           <div class="proto-menu-item" data-proto="2">Prototype 2.0</div>
         </div>
       </div>
@@ -2322,10 +2331,14 @@ function toggleNodesPanel() {
     currentProto = proto;
     protoMenu.querySelectorAll('.proto-menu-item').forEach(function(i) { i.classList.remove('active'); });
     protoMenu.querySelector('[data-proto="' + proto + '"]').classList.add('active');
-    var label = proto === '2' ? 'Prototype 2.0' : proto === '1.1' ? 'Prototype 1.1' : 'Prototype 1.0';
+    var label = proto === '2' ? 'Prototype 2.0'
+              : proto === '1.1' ? 'Prototype 1.1'
+              : proto === '1.2' ? 'Prototype 1.2'
+              : 'Prototype 1.0';
     protoDropdown.firstChild.textContent = label + ' ';
     protoMenu.classList.remove('open');
     document.body.classList.toggle('proto-v11', proto === '1.1');
+    document.body.classList.toggle('proto-v12', proto === '1.2');
     if (proto === '2') {
       verticalFlowItem.style.display = '';
       horizontalFlowItems.forEach(function(i) { i.style.display = 'none'; });
