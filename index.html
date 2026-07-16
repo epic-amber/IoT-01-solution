@@ -672,18 +672,20 @@
   }
   .cn-warning {
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-size: 12px; font-weight: 400; color: #F9A825;
-    background: #FFF8E1; border: 1px solid #F9A825; border-radius: 4px;
+    font-size: 12px; font-weight: 500; line-height: 16px; letter-spacing: 0.03px;
+    color: #FF5722;
+    background: #FFF3E0; border: 1px solid #FF5722; border-radius: 4px;
     padding: 5px 10px; height: 29px; box-sizing: border-box;
-    white-space: nowrap; font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    white-space: nowrap; font-family: 'Roboto', 'Inter', Arial, sans-serif;
   }
   .cn-warning svg { flex-shrink: 0; }
   .cn-error {
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-size: 12px; font-weight: 400; color: #F44336;
-    background: #FFEBEE; border: 1px solid #F44336; border-radius: 4px;
+    font-size: 12px; font-weight: 500; line-height: 16px; letter-spacing: 0.03px;
+    color: #FF0000;
+    background: #FFEBEE; border: 1px solid #FF0000; border-radius: 4px;
     padding: 5px 10px; height: 29px; box-sizing: border-box;
-    white-space: nowrap; font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    white-space: nowrap; font-family: 'Roboto', 'Inter', Arial, sans-serif;
   }
   .cn-error svg { flex-shrink: 0; }
   .cn-body {
@@ -1497,6 +1499,14 @@ function toggleNodesPanel() {
   var connections = [];
   var nodeIdCounter = 0;
 
+  function stripIconBg(dataUrl) {
+    try {
+      var b64 = dataUrl.split(',')[1];
+      var svg = atob(b64).replace(/<rect[^>]*fill-opacity="0\.1"[^>]*\/>/g, '');
+      return 'data:image/svg+xml;base64,' + btoa(svg);
+    } catch(e) { return dataUrl; }
+  }
+
   function getPan() { return canvas._pan || { x: 0, y: 0, s: 1 }; }
 
   function screenToFlow(sx, sy) {
@@ -1534,7 +1544,7 @@ function toggleNodesPanel() {
       html += '<span class="cn-label">' + label + '</span>';
     } else {
       html += '<div class="cn-icon"' + (data.bg ? ' style="background:' + data.bg + '"' : '') + '>';
-      html += '<img src="' + data.src + '" width="' + data.imgW + '" height="' + data.imgH + '">';
+      html += '<img src="' + stripIconBg(data.src) + '" width="24" height="24">';
       html += '</div><span class="cn-label">' + label + '</span>';
     }
     html += '</div>';
@@ -1576,19 +1586,20 @@ function toggleNodesPanel() {
     body.parentNode.insertBefore(wrap, body);
     wrap.appendChild(body);
 
+    var errorGlyph = '<svg viewBox="0 -960 960 960" width="19" height="19" fill="currentColor"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>';
     if (type === 'warning') {
-      body.style.borderColor = '#F9A825';
-      body.style.borderWidth = '2px';
+      body.style.borderColor = '#FF5722';
+      body.style.borderWidth = '1.5px';
       var el = document.createElement('div');
       el.className = 'cn-warning';
-      el.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="#F9A825"/><text x="8" y="12" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">!</text></svg> See warning details';
+      el.innerHTML = errorGlyph + ' See warning details';
       wrap.appendChild(el);
     } else if (type === 'error') {
-      body.style.borderColor = '#F44336';
-      body.style.borderWidth = '2px';
+      body.style.borderColor = '#FF0000';
+      body.style.borderWidth = '1.5px';
       var el = document.createElement('div');
       el.className = 'cn-error';
-      el.innerHTML = '<svg viewBox="0 0 18 18" width="14" height="14"><circle cx="9" cy="9" r="8" fill="none" stroke="#F44336" stroke-width="2"/><line x1="4.5" y1="4.5" x2="13.5" y2="13.5" stroke="#F44336" stroke-width="2" stroke-linecap="round"/></svg> See error details';
+      el.innerHTML = errorGlyph + ' See error details';
       wrap.appendChild(el);
     }
   }

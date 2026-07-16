@@ -131,16 +131,31 @@ While the user drags a node from the panel onto the canvas:
 
 CSS: `.gn-icon`, `.drag-ghost .dg-icon` in [index.html](../index.html).
 
-## Warning / error pills (existing, unchanged by recent redesign)
+## Warning / error state (Figma `3546:19843`, `3537:18227`)
+
+When a node is in warning or error, `addNodeStatus()` wraps the body in `.cn-body-wrap`, changes the card border, and appends a pill below the card.
+
+### Card border
+
+| Variant | Border |
+|---|---|
+| Warning | `1.5px solid #FF5722` |
+| Error | `1.5px solid #FF0000` |
+
+### Pill
 
 Rendered below the card via `.cn-body-wrap`.
 
-| Variant | Text color | Background | Border |
+| Variant | Text/icon color | Background | Border |
 |---|---|---|---|
-| Warning | `#F9A825` | `#FFF8E1` | `1px solid #F9A825` |
-| Error | `#F44336` | `#FFEBEE` | `1px solid #F44336` |
+| Warning | `#FF5722` | `#FFF3E0` | `1px solid #FF5722` |
+| Error | `#FF0000` | `#FFEBEE` | `1px solid #FF0000` |
 
-Both: `4px` radius, `5px 10px` padding, `29px` height, 12px font.
+Both:
+- Radius `4px`, height `29px`, padding `5px 10px`, gap `8px`
+- Font: Roboto Medium `12/16`, letter-spacing `0.03px`
+- Icon: Material Symbols `error` (filled) at `19 × 19`, tinted via `currentColor` (same glyph for warning and error, differs only in state color)
+- Texts: `See warning details` / `See error details`
 
 ## Tooltips (node cards in panel)
 
