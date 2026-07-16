@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>IoT Logic — Flow Builder</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -312,6 +313,25 @@
   .tpl-section-body ol { margin: 0; padding-left: 21px; }
   .tpl-section-body ol li { margin-bottom: 4px; }
   .tpl-section-body ol li:last-child { margin-bottom: 0; }
+  .tpl-callout {
+    background: rgba(30,150,220,0.05);
+    padding: 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .tpl-callout-title {
+    font-size: 14px; font-weight: 500; line-height: 22px; letter-spacing: 0.1px;
+    color: var(--accent);
+  }
+  .tpl-callout-body {
+    font-size: 14px; font-weight: 400; line-height: 22px; letter-spacing: 0.1px;
+    color: rgba(0,0,0,0.8);
+  }
+  .tpl-callout-link {
+    color: var(--accent); cursor: pointer; text-decoration: none;
+    background: none; border: none; padding: 0;
+    font: inherit; letter-spacing: inherit;
+  }
+  .tpl-callout-link:hover { text-decoration: underline; }
   .tpl-buttons {
     display: flex; align-items: center; justify-content: flex-end; gap: 13px;
   }
@@ -438,7 +458,9 @@
     box-shadow: 0 0 9px rgba(0,0,0,0.24); cursor: pointer;
     font-size: 11px; font-weight: 500; color: rgba(0,0,0,0.55);
     font-family: var(--font); gap: 4px; white-space: nowrap;
+    opacity: 0; transition: opacity 120ms ease;
   }
+  body.proto-reveal .proto-dropdown { opacity: 1; }
   .proto-dropdown:hover { background: #f5f5f5; }
   .proto-dropdown svg { width: 12px; height: 12px; flex-shrink: 0; }
   .proto-menu {
@@ -1092,9 +1114,12 @@
         </ol>
       </div>
     </div>
+    <div class="tpl-callout">
+      <div class="tpl-callout-title">Have a custom use case?</div>
+      <div class="tpl-callout-body">Describe it and get a ready-made flow file to upload and edit. <button type="button" class="tpl-callout-link" id="tplDraftAI">Draft with AI Assistant</button></div>
+    </div>
     <div class="tpl-buttons">
       <button class="tpl-btn tpl-btn-cancel" id="tplCancel">Cancel</button>
-      <button class="tpl-btn tpl-btn-ai" id="tplBuildAI">Build with AI</button>
       <button class="tpl-btn tpl-btn-start" id="tplStart">Start editing</button>
     </div>
   </div>
@@ -2261,7 +2286,7 @@ function toggleNodesPanel() {
   var tplOverlay = document.getElementById('tplOverlay');
   var tplClose = document.getElementById('tplClose');
   var tplCancel = document.getElementById('tplCancel');
-  var tplBuildAI = document.getElementById('tplBuildAI');
+  var tplDraftAI = document.getElementById('tplDraftAI');
   var tplStart = document.getElementById('tplStart');
 
   function openTemplateModal() {
@@ -2279,7 +2304,7 @@ function toggleNodesPanel() {
 
   tplClose.addEventListener('click', function() { closeTemplateAndGoTest(); });
   tplCancel.addEventListener('click', function() { closeTemplateAndGoTest(); });
-  tplBuildAI.addEventListener('click', function() {
+  tplDraftAI.addEventListener('click', function() {
     tplOverlay.classList.remove('open');
     aiOverlay.classList.add('open');
   });
@@ -2310,9 +2335,15 @@ function toggleNodesPanel() {
     else loadTestFlow();
   });
 
-  // Prototype version dropdown
+  // Prototype version dropdown (hidden by default; toggle visibility with Cmd/Ctrl+Shift+P)
   var protoDropdown = document.getElementById('protoDropdown');
   var protoMenu = document.getElementById('protoMenu');
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'P' || e.key === 'p')) {
+      e.preventDefault();
+      document.body.classList.toggle('proto-reveal');
+    }
+  });
   protoDropdown.addEventListener('click', function(e) {
     if (e.target.closest('.proto-menu-item')) return;
     protoMenu.classList.toggle('open');
