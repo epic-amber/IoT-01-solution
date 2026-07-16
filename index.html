@@ -18,6 +18,24 @@
     --nav-expanded-w: 312px;
     --header-h: 100px;
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* ── Figma tokens (Vuetify 3-aligned) ── */
+    --ga-0: 0px;   --ga-1: 4px;   --ga-2: 8px;    --ga-3: 12px;
+    --ga-4: 16px;  --ga-5: 20px;  --ga-6: 24px;   --ga-7: 28px;   --ga-8: 32px;
+    --pd-2: 8px;   --pd-4: 16px;  --pd-6: 24px;
+    --rounded: 4px;
+    --large: 8px;
+    --opacity-13: rgba(0,0,0,0.13);
+    --opacity-38: rgba(0,0,0,0.38);
+    --opacity-60: rgba(0,0,0,0.6);
+    --opacity-80: rgba(0,0,0,0.8);
+    --opacity-87: rgba(0,0,0,0.87);
+    --overlay-accent: rgba(30,150,220,0.05);
+    --surface-ghost: #F5F5F5;
+    --header-shadow: 0 4px 4px rgba(0,0,0,0.05), 0 0 2px rgba(0,0,0,0.05);
+    --flows-shadow: 0 4px 4px rgba(0,0,0,0.14), 0 6px 6px rgba(0,0,0,0.12);
+    --carousel-shadow: 0 3px 6px rgba(0,0,0,0.14), 0 4px 8px rgba(0,0,0,0.12);
+    --switch-thumb-shadow: 0 2px 2px rgba(0,0,0,0.14), 0 3px 3px rgba(0,0,0,0.12);
   }
   body { font-family: var(--font); height: 100vh; width: 100vw; overflow: hidden; display: flex; background: var(--canvas-bg); }
 
@@ -792,6 +810,340 @@
   .v2-canvas .drag-ghost .dg-icon { width: 54px; height: 54px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); }
   .v2-canvas .drag-ghost .dg-icon img { width: 54px; height: 54px; }
   .v2-canvas .drag-ghost .dg-label { font-size: 11px; color: #333; }
+
+  /* ─────────── Home view (IoT Logic first screen) ─────────── */
+  #homeView {
+    flex: 1; min-width: 0; height: 100vh; overflow: hidden;
+    background: var(--surface-ghost);
+    display: flex; flex-direction: column;
+    font-family: 'Roboto', var(--font);
+  }
+
+  /* Home header */
+  .home-header {
+    height: 100px; flex-shrink: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--opacity-13);
+    box-shadow: var(--header-shadow);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--ga-4) var(--ga-6);
+  }
+  .home-logo {
+    display: flex; align-items: center; gap: 8px;
+    height: 30px;
+  }
+  .home-logo-icon { width: 24px; height: 30px; flex-shrink: 0; }
+  .home-logo-text {
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 20px; line-height: 30px;
+    color: var(--text-secondary);
+    letter-spacing: 0.15px;
+  }
+  .home-divider {
+    width: 1px; height: 20px;
+    background: var(--opacity-13);
+  }
+  .home-header-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: var(--ga-1);
+    padding: 0 var(--ga-2);
+    background: none; border: none; cursor: pointer;
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 14px; line-height: 36px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    border-radius: var(--rounded);
+    white-space: nowrap;
+  }
+  .home-btn:hover { background: rgba(0,0,0,0.04); }
+  .home-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* Templates */
+  .home-templates {
+    flex-shrink: 0;
+    background: var(--surface-ghost);
+    padding: var(--ga-7) var(--ga-6);
+    display: flex; flex-direction: column; gap: var(--ga-2);
+  }
+  .home-section-title-sm {
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 16px; line-height: 28px;
+    color: var(--opacity-87);
+    letter-spacing: 0.024px;
+  }
+  .tpl-carousel-wrap { position: relative; }
+  .tpl-carousel {
+    position: relative; overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right,
+      transparent 0, #000 20px,
+      #000 calc(100% - 60px), transparent 100%);
+            mask-image: linear-gradient(to right,
+      transparent 0, #000 20px,
+      #000 calc(100% - 60px), transparent 100%);
+  }
+  .tpl-track {
+    display: flex; align-items: stretch; gap: var(--ga-5);
+    overflow-x: auto; scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 2px 0;
+  }
+  .tpl-track::-webkit-scrollbar { display: none; }
+  .tpl-card {
+    flex-shrink: 0;
+    width: 240px;
+    padding: var(--ga-4);
+    background: #fff;
+    border: 1.5px solid transparent;
+    border-radius: var(--rounded);
+    box-shadow: inset 0 0 0 1px var(--opacity-13);
+    display: flex; flex-direction: column; gap: var(--ga-3);
+    align-items: flex-end;
+    transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+    box-sizing: border-box;
+  }
+  .tpl-card-text {
+    align-self: stretch;
+    height: 44px;
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 14px; line-height: 22px;
+    color: var(--opacity-60);
+    letter-spacing: 0.014px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; word-break: break-word;
+  }
+  .tpl-card-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: rgba(0,0,0,0.04);
+    border-radius: var(--rounded);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--opacity-60);
+    transition: background 0.12s, color 0.12s;
+  }
+  .tpl-card-icon svg { width: 24px; height: 24px; }
+  .tpl-card[data-flow] { cursor: pointer; }
+  .tpl-card[data-flow]:hover,
+  .tpl-card.selected {
+    background:
+      linear-gradient(90deg, var(--overlay-accent) 0%, var(--overlay-accent) 100%),
+      #fff;
+    border-color: var(--accent);
+    box-shadow: none;
+  }
+  .tpl-card[data-flow]:hover .tpl-card-icon,
+  .tpl-card.selected .tpl-card-icon {
+    background: var(--overlay-accent);
+    color: var(--accent);
+  }
+  .tpl-carousel-btn {
+    position: absolute;
+    width: 36px; height: 36px;
+    top: 50%; transform: translateY(-50%);
+    background: #fff;
+    border: 1px solid var(--opacity-13);
+    border-radius: 9999px;
+    box-shadow: var(--carousel-shadow);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    color: var(--opacity-87);
+    z-index: 2;
+  }
+  .tpl-carousel-btn:hover { background: #FAFAFA; }
+  .tpl-carousel-btn svg { width: 24px; height: 24px; }
+  .tpl-carousel-btn.left { left: 11px; }
+  .tpl-carousel-btn.right { right: 11px; }
+  .tpl-carousel-btn.left svg { transform: rotate(180deg); }
+
+  /* Flows container */
+  .home-flows {
+    flex: 1; min-height: 0;
+    background: #fff;
+    box-shadow: var(--flows-shadow);
+    padding: var(--ga-8) var(--ga-6);
+    display: flex; flex-direction: column; gap: var(--ga-5);
+    overflow: hidden;
+  }
+  .flows-header {
+    display: flex; align-items: center; gap: var(--ga-7);
+    flex-shrink: 0;
+  }
+  .home-section-title-lg {
+    flex: 1; min-width: 0;
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 20px; line-height: 32px;
+    color: var(--opacity-87);
+    letter-spacing: 0.05px;
+    word-break: break-word;
+  }
+  .flows-actions { display: flex; align-items: center; gap: var(--ga-3); }
+  .flows-btn {
+    display: inline-flex; align-items: center; gap: var(--ga-1);
+    padding: 0 var(--ga-4);
+    background: #fff;
+    border: 1px solid var(--opacity-13);
+    border-radius: var(--rounded);
+    cursor: pointer;
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 14px; line-height: 36px;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .flows-btn:hover { background: rgba(30,150,220,0.04); }
+  .flows-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .flows-btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding-left: var(--ga-4);
+    padding-right: var(--ga-5);
+  }
+  .flows-btn-primary:hover { background: #2a86cc; }
+
+  .flows-table {
+    display: flex; flex-direction: column; gap: 0;
+    flex: 1; min-height: 0;
+    overflow: hidden;
+  }
+  .flows-thead {
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0;
+    width: 100%;
+  }
+  .flows-thead .cell {
+    display: flex; align-items: center; gap: var(--ga-5);
+    min-height: 50px;
+    padding: var(--ga-3) var(--ga-5);
+  }
+  .flows-thead .cell-name { width: 410px; flex-shrink: 0; padding-left: 0; padding-right: 0; }
+  .flows-thead .cell-flex { flex: 1; min-width: 149px; }
+  .flows-thead .cell-empty { width: 117px; flex-shrink: 0; }
+  .flows-thead-label {
+    display: flex; align-items: center; gap: var(--ga-1);
+    font-family: 'Roboto', var(--font);
+    font-weight: 500; font-size: 14px; line-height: 20px;
+    color: var(--opacity-80);
+    letter-spacing: 0.035px;
+    white-space: nowrap;
+  }
+  .flows-thead-label svg { width: 16px; height: 16px; color: var(--opacity-80); }
+
+  .flows-tbody {
+    display: flex; flex-direction: column; gap: var(--ga-2);
+    flex: 1; min-height: 0;
+    overflow-y: auto; overflow-x: hidden;
+    padding-right: 4px;
+  }
+  .flows-tbody::-webkit-scrollbar { width: 6px; }
+  .flows-tbody::-webkit-scrollbar-track { background: transparent; }
+  .flows-tbody::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15); border-radius: 3px;
+  }
+  .flows-tbody::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
+
+  .flow-row {
+    display: flex; align-items: center; gap: 0;
+    background: #fff;
+    border: 1.5px solid transparent;
+    border-radius: var(--rounded);
+    box-shadow: inset 0 0 0 1px var(--opacity-13);
+    transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .flow-row[data-flow] { cursor: pointer; }
+  .flow-row[data-flow]:hover,
+  .flow-row.selected {
+    background:
+      linear-gradient(90deg, var(--overlay-accent) 0%, var(--overlay-accent) 100%),
+      #fff;
+    border-color: var(--accent);
+    box-shadow: none;
+  }
+  .flow-row .row-name {
+    width: 410px; flex-shrink: 0;
+    padding: var(--ga-5);
+    display: flex; flex-direction: column; gap: var(--ga-1);
+    box-sizing: border-box;
+  }
+  .flow-row .row-name-title {
+    font-family: 'Roboto', var(--font);
+    font-weight: 700; font-size: 16px; line-height: 28px;
+    color: var(--opacity-87);
+    letter-spacing: 0.024px;
+    word-break: break-word;
+  }
+  .flow-row .row-name-desc {
+    font-family: 'Roboto', var(--font);
+    font-weight: 400; font-size: 14px; line-height: 22px;
+    color: var(--opacity-60);
+    letter-spacing: 0.014px;
+    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+    overflow: hidden; text-overflow: ellipsis;
+    word-break: break-word;
+  }
+  .flow-row .row-data {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; align-self: stretch;
+  }
+  .flow-row .row-cell {
+    flex: 1; min-width: 149px;
+    padding: var(--ga-5);
+    display: flex; align-items: center;
+    font-family: 'Roboto', var(--font);
+    font-weight: 400; font-size: 14px; line-height: 22px;
+    color: var(--opacity-60);
+    letter-spacing: 0.014px;
+    align-self: stretch;
+  }
+  .flow-row .row-cell-status { gap: 10px; }
+  .flow-row .row-actions {
+    width: 116px; flex-shrink: 0;
+    padding: var(--ga-5);
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: var(--ga-5);
+    align-self: stretch;
+  }
+  .flow-row .row-icon-btn {
+    background: none; border: none; padding: var(--ga-1);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--opacity-60);
+  }
+  .flow-row .row-icon-btn:hover { color: var(--opacity-87); }
+  .flow-row .row-icon-btn svg { width: 24px; height: 24px; }
+  .flow-row .row-more {
+    width: 24px; height: 24px; color: var(--opacity-38);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flow-row .row-more svg { width: 24px; height: 24px; }
+
+  /* Vuetify-style switch */
+  .v-switch {
+    position: relative;
+    width: 40px; height: 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .v-switch-track {
+    width: 36px; height: 14px;
+    background: var(--accent);
+    opacity: 0.6;
+    border-radius: var(--large);
+  }
+  .v-switch-thumb {
+    position: absolute; top: 50%;
+    width: 20px; height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: var(--switch-thumb-shadow);
+    transform: translateY(-50%);
+    transition: left 0.15s;
+    left: 16px;
+  }
+  .v-switch.off .v-switch-track { background: rgba(0,0,0,0.38); opacity: 1; border-radius: 9999px; }
+  .v-switch.off .v-switch-thumb { left: 4px; }
 </style>
 
 <div class="sidebar" id="sidebar">
@@ -810,7 +1162,7 @@
   <div class="sidebar-bottom" id="navBottom"></div>
 </div>
 
-<div class="main">
+<div class="main" id="flowView" style="display:none">
   <div class="header">
     <div class="primary-controls">
       <div class="back-btn">
@@ -825,7 +1177,7 @@
           <div class="flow-menu" id="flowMenu">
             <div class="flow-menu-item active" data-flow="test">Test flow</div>
             <div class="flow-menu-item" data-flow="qa">QA edited</div>
-            <div class="flow-menu-item" data-flow="antitheft">Anti-theft protection</div>
+            <div class="flow-menu-item" data-flow="antitheft" id="antitheftFlowItem" style="display:none">Anti-theft protection</div>
             <div class="flow-menu-item" data-flow="vertical" id="verticalFlowItem" style="display:none">Vertical test flow</div>
             <div class="flow-menu-item" data-flow="superlarge">SuperLarge Flow</div>
             <div class="flow-menu-item" data-flow="status">Status</div>
@@ -1087,6 +1439,116 @@
   </div>
 </div>
 
+<div class="main" id="homeView">
+  <div class="home-header">
+    <div class="home-logo" aria-label="IoT Logic">
+      <svg class="home-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6.8" y="3.7" width="2.2" height="12.6" rx="1.1" fill="#3296DC"/>
+        <rect x="10.9" y="5.1" width="2.2" height="5.2" rx="1.1" fill="#3296DC"/>
+        <rect x="15" y="11.9" width="2.2" height="8.4" rx="1.1" fill="#3296DC"/>
+      </svg>
+      <span class="home-logo-text">IoT Logic</span>
+    </div>
+    <div class="home-header-actions">
+      <button type="button" class="home-btn">
+        <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h120v-120H200v120Zm200 0h160v-120H400v120Zm240 0h120v-120H640v120ZM200-400h120v-160H200v160Zm200 0h160v-160H400v160Zm240 0h120v-160H640v160ZM200-640h560v-120H200v120Z"/></svg>
+        Mapping table
+      </button>
+    </div>
+  </div>
+
+  <section class="home-templates" aria-label="Flow templates">
+    <h2 class="home-section-title-sm">Flow templates</h2>
+    <div class="tpl-carousel-wrap">
+    <div class="tpl-carousel">
+      <div class="tpl-track" id="tplTrack">
+        <div class="tpl-card selected" data-flow="antitheft" role="button" tabindex="0">
+          <div class="tpl-card-text">Anti-theft protection</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Temperature, pressure conversion</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Battery voltage as percentage</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Brake efficiency estimation (pressure delta)</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Speed limit monitoring and alert</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Geofence entry and exit detection</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Fuel consumption calculation</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-card-text">Engine temperature warning system</div>
+          <div class="tpl-card-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-80 40-320l80-40 360 200 360-200 80 40L480-80Zm0-160L40-480l440-240 440 240-440 240Zm0-92 274-148-274-148-274 148 274 148Z"/></svg></div>
+        </div>
+      </div>
+    </div>
+      <button type="button" class="tpl-carousel-btn left" id="tplPrev" aria-label="Previous templates" style="display:none">
+        <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+      </button>
+      <button type="button" class="tpl-carousel-btn right" id="tplNext" aria-label="Next templates">
+        <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <section class="home-flows" aria-label="Created flows">
+    <div class="flows-header">
+      <h1 class="home-section-title-lg">Created flows</h1>
+      <div class="flows-actions">
+        <button type="button" class="flows-btn">
+          <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="m272-424-73-162-162-73 162-73 73-162 73 162 162 73-162 73-73 162Zm400 320-45-99-99-45 99-45 45-99 45 99 99 45-99 45-45 99Zm-25-395-56-125-125-56 125-56 56-125 56 125 125 56-125 56-56 125Z"/></svg>
+          Draft with AI
+        </button>
+        <button type="button" class="flows-btn">
+          <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></svg>
+          Upload flow
+        </button>
+        <button type="button" class="flows-btn flows-btn-primary">
+          <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+          Create flow
+        </button>
+      </div>
+    </div>
+
+    <div class="flows-table">
+      <div class="flows-thead" role="row">
+        <div class="cell cell-name" role="columnheader">
+          <span class="flows-thead-label">Flow name</span>
+        </div>
+        <div class="cell cell-flex" role="columnheader">
+          <span class="flows-thead-label">
+            Last modified
+            <svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-200 240-440l56-56 144 144v-408h80v408l144-144 56 56-240 240Z"/></svg>
+          </span>
+        </div>
+        <div class="cell cell-flex" role="columnheader">
+          <span class="flows-thead-label">Connected devices</span>
+        </div>
+        <div class="cell cell-flex" role="columnheader">
+          <span class="flows-thead-label">Status</span>
+        </div>
+        <div class="cell cell-empty" role="columnheader"></div>
+      </div>
+
+      <div class="flows-tbody" id="flowsTbody" role="rowgroup"></div>
+    </div>
+  </section>
+</div>
+
 <!-- Template Modal -->
 <div class="tpl-overlay" id="tplOverlay">
   <div class="tpl-modal">
@@ -1239,7 +1701,7 @@ function toggleNodesPanel() {
   active.classList.toggle('collapsed');
 }
 
-(function() {
+window.__renderGhostFlow = function() {
   var iconMap = {};
   document.querySelectorAll('#nodesPanel .node-card').forEach(function(card) {
     var label = card.querySelector('.node-label').textContent.trim();
@@ -1260,6 +1722,7 @@ function toggleNodesPanel() {
 
   var flow = document.getElementById('onbFlow');
   if (!flow) return;
+  flow.innerHTML = '<svg class="onb-lines" viewBox="0 0 660 320" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>';
 
   var ghostViewBoxFix = {
     'Device Action': '4.5 4.5 21 21',
@@ -1364,7 +1827,8 @@ function toggleNodesPanel() {
       flow.appendChild(d);
     });
   });
-})();
+};
+window.__renderGhostFlow();
 
 (function() {
   var canvas = document.querySelector('.canvas');
@@ -2532,5 +2996,120 @@ function toggleNodesPanel() {
 
   renderFlowPath(document.getElementById('flowPath'));
   updateFlowPath();
+})();
+
+/* ─────────── Home view (IoT Logic first screen) ─────────── */
+(function() {
+  var homeView = document.getElementById('homeView');
+  var flowView = document.getElementById('flowView');
+  if (!homeView || !flowView) return;
+
+  var flowRows = [
+    { dataFlow: 'test',      name: 'Test flow',            desc: 'IF/THEN branching example',           date: 'Mar 26', devices: 5,  active: true  },
+    { dataFlow: 'qa',        name: 'QA edited',            desc: 'Mid-size flow used during QA',        date: 'Mar 24', devices: 12, active: true  },
+    { dataFlow: 'superlarge',name: 'SuperLarge Flow',      desc: 'Dense flow with many action nodes',   date: 'Mar 21', devices: 48, active: true  },
+    { dataFlow: 'status',    name: 'Status',               desc: 'Warning and error state examples',    date: 'Mar 18', devices: 3,  active: false },
+    { dataFlow: 'longnames', name: 'Fuel theft detection', desc: 'Long node labels stress-test',        date: 'Mar 15', devices: 7,  active: true  },
+    { dataFlow: 'vertical',  name: 'Vertical test flow',   desc: 'Top-to-bottom layout (Prototype 2.0)',date: 'Mar 12', devices: 5,  active: true, verticalOnly: true }
+  ];
+  var placeholderRows = [
+    { name: 'Flow name', desc: 'Flow description in one line or two lines', date: 'Mar 10', devices: 5, active: true  },
+    { name: 'Flow name', desc: 'Flow description in one line or two lines', date: 'Mar 8',  devices: 5, active: true  },
+    { name: 'Flow name', desc: 'Flow description in one line or two lines', date: 'Mar 5',  devices: 5, active: false },
+    { name: 'Flow name', desc: 'Flow description in one line or two lines', date: 'Mar 2',  devices: 5, active: true  }
+  ];
+
+  var DL_SVG  = '<svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>';
+  var MORE_SVG = '<svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg>';
+
+  function renderRow(row) {
+    var el = document.createElement('div');
+    el.className = 'flow-row';
+    if (row.dataFlow) el.setAttribute('data-flow', row.dataFlow);
+    el.setAttribute('role', 'row');
+    var statusText = row.active ? 'Active' : 'Inactive';
+    var switchCls = row.active ? 'v-switch' : 'v-switch off';
+    el.innerHTML =
+      '<div class="row-name">' +
+        '<div class="row-name-title">' + row.name + '</div>' +
+        '<div class="row-name-desc">' + row.desc + '</div>' +
+      '</div>' +
+      '<div class="row-data">' +
+        '<div class="row-cell">' + row.date + '</div>' +
+        '<div class="row-cell">' + row.devices + '</div>' +
+        '<div class="row-cell row-cell-status">' +
+          '<span>' + statusText + '</span>' +
+          '<span class="' + switchCls + '"><span class="v-switch-track"></span><span class="v-switch-thumb"></span></span>' +
+        '</div>' +
+        '<div class="row-actions">' +
+          '<button type="button" class="row-icon-btn" aria-label="Download flow">' + DL_SVG + '</button>' +
+          '<span class="row-more" aria-hidden="true">' + MORE_SVG + '</span>' +
+        '</div>' +
+      '</div>';
+    return el;
+  }
+
+  var tbody = document.getElementById('flowsTbody');
+  var currentProtoIsV2 = document.body.classList.contains('proto-v2');
+  flowRows.forEach(function(r) {
+    if (r.verticalOnly && !currentProtoIsV2) return;
+    tbody.appendChild(renderRow(r));
+  });
+  placeholderRows.forEach(function(r) { tbody.appendChild(renderRow(r)); });
+
+  function showHome() {
+    homeView.style.display = '';
+    flowView.style.display = 'none';
+  }
+  function showFlow(dataFlow) {
+    homeView.style.display = 'none';
+    flowView.style.display = '';
+    if (typeof window.__renderGhostFlow === 'function') {
+      requestAnimationFrame(function() { window.__renderGhostFlow(); });
+    }
+    var item = document.querySelector('.flow-menu-item[data-flow="' + dataFlow + '"]');
+    if (item) item.click();
+  }
+
+  tbody.addEventListener('click', function(e) {
+    if (e.target.closest('.row-icon-btn') || e.target.closest('.row-more') || e.target.closest('.v-switch')) return;
+    var row = e.target.closest('.flow-row[data-flow]');
+    if (!row) return;
+    showFlow(row.getAttribute('data-flow'));
+  });
+
+  document.querySelectorAll('.tpl-card[data-flow]').forEach(function(el) {
+    el.addEventListener('click', function() { showFlow(el.getAttribute('data-flow')); });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showFlow(el.getAttribute('data-flow')); }
+    });
+  });
+
+  var backBtn = document.querySelector('#flowView .back-btn');
+  if (backBtn) {
+    backBtn.style.cursor = 'pointer';
+    backBtn.addEventListener('click', showHome);
+  }
+
+  /* Templates carousel */
+  var track = document.getElementById('tplTrack');
+  var prev = document.getElementById('tplPrev');
+  var next = document.getElementById('tplNext');
+  function syncCarousel() {
+    if (!track) return;
+    var atStart = track.scrollLeft <= 4;
+    var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    prev.style.display = atStart ? 'none' : '';
+    next.style.display = atEnd ? 'none' : '';
+  }
+  if (track && prev && next) {
+    track.addEventListener('scroll', syncCarousel);
+    window.addEventListener('resize', syncCarousel);
+    prev.addEventListener('click', function() { track.scrollBy({ left: -520, behavior: 'smooth' }); });
+    next.addEventListener('click', function() { track.scrollBy({ left:  520, behavior: 'smooth' }); });
+    requestAnimationFrame(syncCarousel);
+  }
+
+  showHome();
 })();
 </script>
