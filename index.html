@@ -1254,8 +1254,8 @@ function toggleNodesPanel() {
   var ghosts = [
     { label: 'Data Source node', key: 'Data Source', x: 10, y: 130, desc: 'Required starting point.' },
     { label: 'Object left geofence', key: 'IF/THEN Logic', x: 235, y: 130, desc: 'Splits the flow into THEN / ELSE<br>branches based on a condition.' },
-    { label: 'Block the engine', key: 'Device Action', x: 485, y: 45, desc: 'Sends a command back<br>to the device' },
-    { label: 'Send to tracking', key: 'Output Endpoint', x: 485, y: 215, desc: 'Required endpoint &mdash; without it,<br>data won&rsquo;t reach Navixy.' }
+    { label: 'Block the engine', key: 'Device Action', x: 558, y: 58, desc: 'Sends a command back<br>to the device' },
+    { label: 'Send to tracking', key: 'Output Endpoint', x: 558, y: 202, desc: 'Required endpoint &mdash; without it,<br>data won&rsquo;t reach Navixy.' }
   ];
 
   var flow = document.getElementById('onbFlow');
@@ -1316,8 +1316,18 @@ function toggleNodesPanel() {
       return '<g transform="translate(' + p.x + ',' + p.y + ')"><circle r="9" fill="white" stroke="#DEDEDE" stroke-width="1.3"/>' + icon + '</g>';
     }
     function bez(a, b, label) {
-      var mx = (a.x + b.x) / 2;
-      var d = 'M ' + a.x + ' ' + a.y + ' C ' + mx + ' ' + a.y + ' ' + mx + ' ' + b.y + ' ' + b.x + ' ' + b.y;
+      var d;
+      var dyAbs = Math.abs(b.y - a.y);
+      if (label) {
+        var sx = a.x + 60;
+        var dxL = Math.max(Math.abs(b.x - sx) * 0.5, dyAbs * 0.3);
+        d = 'M ' + a.x + ' ' + a.y +
+            ' L ' + sx + ' ' + a.y +
+            ' C ' + (sx + dxL) + ' ' + a.y + ' ' + (b.x - dxL) + ' ' + b.y + ' ' + b.x + ' ' + b.y;
+      } else {
+        var dx = Math.max(Math.abs(b.x - a.x) * 0.5, dyAbs * 0.3);
+        d = 'M ' + a.x + ' ' + a.y + ' C ' + (a.x + dx) + ' ' + a.y + ' ' + (b.x - dx) + ' ' + b.y + ' ' + b.x + ' ' + b.y;
+      }
       if (label) {
         return '<path data-label="' + label + '" d="' + d + '" stroke="#DEDEDE" stroke-width="1.3" fill="none"/>';
       }
@@ -1337,11 +1347,12 @@ function toggleNodesPanel() {
 
     svg.querySelectorAll('path[data-label]').forEach(function(p) {
       var lbl = p.getAttribute('data-label');
+      var anchor = 38;
       var L = p.getTotalLength();
-      var mid = p.getPointAtLength(L / 2);
+      var pt = p.getPointAtLength(anchor);
       var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      t.setAttribute('x', mid.x);
-      t.setAttribute('y', mid.y);
+      t.setAttribute('x', pt.x);
+      t.setAttribute('y', pt.y);
       t.setAttribute('text-anchor', 'middle');
       t.setAttribute('dominant-baseline', 'central');
       t.setAttribute('font-size', '12');
@@ -1352,8 +1363,9 @@ function toggleNodesPanel() {
       svg.appendChild(t);
       var bbox = t.getBBox();
       var gap = bbox.width + 12;
-      var dash = Math.max(0, (L - gap) / 2);
-      p.setAttribute('stroke-dasharray', dash + ' ' + gap);
+      var before = Math.max(0, anchor - gap / 2);
+      var after = Math.max(0, L - before - gap);
+      p.setAttribute('stroke-dasharray', before + ' ' + gap + ' ' + after);
     });
 
     r.forEach(function(n, i) {
@@ -1754,19 +1766,46 @@ function toggleNodesPanel() {
     return screenToFlow(r.left + r.width / 2, r.top + r.height / 2);
   }
 
+  function hHandle(dx, dy) {
+    return Math.max(Math.abs(dx) * 0.5, Math.abs(dy) * 0.3);
+  }
+  function vHandle(dx, dy) {
+    return Math.max(Math.abs(dy) * 0.5, Math.abs(dx) * 0.3);
+  }
   function bezier(x1, y1, x2, y2) {
-    var dx = Math.abs(x2 - x1) * 0.5;
+    var dx = hHandle(x2 - x1, y2 - y1);
     return 'M ' + x1 + ' ' + y1 + ' C ' + (x1 + dx) + ' ' + y1 + ' ' + (x2 - dx) + ' ' + y2 + ' ' + x2 + ' ' + y2;
   }
   function verticalBezier(x1, y1, x2, y2) {
-    var dy = Math.abs(y2 - y1) * 0.5;
+    var dy = vHandle(x2 - x1, y2 - y1);
     return 'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + (y1 + dy) + ' ' + x2 + ' ' + (y2 - dy) + ' ' + x2 + ' ' + y2;
+  }
+  var LEAD_PX = 60;
+  var LABEL_ANCHOR_PX = 38;
+  function leadBezier(x1, y1, x2, y2) {
+    var sx = x1 + LEAD_PX;
+    var dx = hHandle(x2 - sx, y2 - y1);
+    return 'M ' + x1 + ' ' + y1 +
+           ' L ' + sx + ' ' + y1 +
+           ' C ' + (sx + dx) + ' ' + y1 + ' ' + (x2 - dx) + ' ' + y2 + ' ' + x2 + ' ' + y2;
+  }
+  function leadVerticalBezier(x1, y1, x2, y2) {
+    var sy = y1 + LEAD_PX;
+    var dy = vHandle(x2 - x1, y2 - sy);
+    return 'M ' + x1 + ' ' + y1 +
+           ' L ' + x1 + ' ' + sy +
+           ' C ' + x1 + ' ' + (sy + dy) + ' ' + x2 + ' ' + (y2 - dy) + ' ' + x2 + ' ' + y2;
   }
 
   function updateConnections() {
     connections.forEach(function(c) {
       var f = getConnCenter(c.fromEl), t = getConnCenter(c.toEl);
-      var b = c.vertical ? verticalBezier : bezier;
+      var b;
+      if (c.label) {
+        b = c.vertical ? leadVerticalBezier : leadBezier;
+      } else {
+        b = c.vertical ? verticalBezier : bezier;
+      }
       c.path.setAttribute('d', b(f.x, f.y, t.x, t.y));
       if (c.textEl && c.label) {
         applyDashLabel(c.path, c.textEl);
@@ -1886,14 +1925,16 @@ function toggleNodesPanel() {
   }
 
   function applyDashLabel(path, textEl) {
+    var anchor = LABEL_ANCHOR_PX;
     var L = path.getTotalLength();
-    var mid = path.getPointAtLength(L / 2);
-    textEl.setAttribute('x', mid.x);
-    textEl.setAttribute('y', mid.y);
+    var pt = path.getPointAtLength(anchor);
+    textEl.setAttribute('x', pt.x);
+    textEl.setAttribute('y', pt.y);
     var bbox = textEl.getBBox();
     var gap = bbox.width + 12;
-    var dash = Math.max(0, (L - gap) / 2);
-    path.setAttribute('stroke-dasharray', dash + ' ' + gap);
+    var before = Math.max(0, anchor - gap / 2);
+    var after = Math.max(0, L - before - gap);
+    path.setAttribute('stroke-dasharray', before + ' ' + gap + ' ' + after);
   }
 
   function addConnection(fromEl, toEl, color, label) {
@@ -1902,7 +1943,7 @@ function toggleNodesPanel() {
     path.setAttribute('stroke', color || '#9E9E9E');
     path.setAttribute('stroke-width', '2');
     path.setAttribute('fill', 'none');
-    var d = bezier(f.x, f.y, t.x, t.y);
+    var d = label ? leadBezier(f.x, f.y, t.x, t.y) : bezier(f.x, f.y, t.x, t.y);
     path.setAttribute('d', d);
     connSvg.appendChild(path);
     var textEl = null;
@@ -1927,7 +1968,7 @@ function toggleNodesPanel() {
     path.setAttribute('stroke', color || '#9E9E9E');
     path.setAttribute('stroke-width', '2');
     path.setAttribute('fill', 'none');
-    var d = verticalBezier(f.x, f.y, t.x, t.y);
+    var d = label ? leadVerticalBezier(f.x, f.y, t.x, t.y) : verticalBezier(f.x, f.y, t.x, t.y);
     path.setAttribute('d', d);
     connSvg.appendChild(path);
     var textEl = null;
