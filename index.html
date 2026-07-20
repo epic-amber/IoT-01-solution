@@ -723,6 +723,15 @@
   .cn-conn-group .cn-conn:last-child {
     top: 70%; transform: translateY(-50%);
   }
+  .cn-conn circle,
+  .cn-conn path,
+  .cn-conn line {
+    transition: stroke 0.15s ease, fill 0.15s ease, stroke-width 0.15s ease;
+  }
+  body.connecting,
+  body.connecting * {
+    cursor: grabbing !important;
+  }
   .drag-ghost {
     position: fixed; pointer-events: none; z-index: 1000;
     display: flex; align-items: center; gap: 8px;
@@ -1495,7 +1504,7 @@ function toggleNodesPanel() {
     return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#9E9E9E" stroke-width="1.3"/><line x1="5.5" y1="9" x2="12.5" y2="9" stroke="#9E9E9E" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="5.5" x2="9" y2="12.5" stroke="#9E9E9E" stroke-width="1.5" stroke-linecap="round"/></svg>';
   }
   function arrowSvg() {
-    return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#9E9E9E" stroke-width="1.3"/><path d="M8.778 4.337L7.996 5.12L11.093 8.222H4.338V9.332H11.093L7.996 12.435L8.778 13.218L13.219 8.777L8.778 4.337Z" fill="#9E9E9E"/></svg>';
+    return '<svg class="cn-conn cn-conn--input" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#9E9E9E" stroke-width="1.3"/><path d="M8.778 4.337L7.996 5.12L11.093 8.222H4.338V9.332H11.093L7.996 12.435L8.778 13.218L13.219 8.777L8.778 4.337Z" fill="#9E9E9E"/></svg>';
   }
   function thenSvg() {
     return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#00C853" stroke-width="1.3"/><path d="M5.8 9L7.8 11L12.2 6.6" stroke="#00C853" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1504,7 +1513,7 @@ function toggleNodesPanel() {
     return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#E53935" stroke-width="1.3"/><line x1="6.2" y1="6.2" x2="11.8" y2="11.8" stroke="#E53935" stroke-width="1.5" stroke-linecap="round"/><line x1="11.8" y1="6.2" x2="6.2" y2="11.8" stroke="#E53935" stroke-width="1.5" stroke-linecap="round"/></svg>';
   }
   function arrowDownSvg() {
-    return '<svg class="cn-conn" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#9E9E9E" stroke-width="1.3"/><path d="M8.778 4.337L7.996 5.12L11.093 8.222H4.338V9.332H11.093L7.996 12.435L8.778 13.218L13.219 8.777L8.778 4.337Z" fill="#9E9E9E" transform="rotate(90 9 9)"/></svg>';
+    return '<svg class="cn-conn cn-conn--input" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8.3" fill="white" stroke="#9E9E9E" stroke-width="1.3"/><path d="M8.778 4.337L7.996 5.12L11.093 8.222H4.338V9.332H11.093L7.996 12.435L8.778 13.218L13.219 8.777L8.778 4.337Z" fill="#9E9E9E" transform="rotate(90 9 9)"/></svg>';
   }
 
   var nodes = [];
@@ -1813,7 +1822,107 @@ function toggleNodesPanel() {
     });
   }
 
-  var tempLine = null, connStart = null;
+  var tempLine = null, connStart = null, lastHovered = null;
+
+  function isValidTarget(connEl, sourceNodeEl) {
+    if (!connEl) return false;
+    if (connStart && connEl === connStart.el) return false;
+    var nodeEl = connEl.closest('.canvas-node');
+    if (!nodeEl || nodeEl === sourceNodeEl) return false;
+    var body = nodeEl.querySelector('.cn-body');
+    if (!body) return false;
+    var siblings = Array.from(nodeEl.children);
+    var bodyIdx = siblings.indexOf(body);
+    var connParent = connEl.closest('.cn-conn-group') || connEl;
+    var connIdx = siblings.indexOf(connParent);
+    return connIdx < bodyIdx;
+  }
+
+  function getNodeAccentColor(nodeEl) {
+    if (!nodeEl) return null;
+    var type = nodeEl.getAttribute('data-type');
+    return (NODE_TYPES[type] && NODE_TYPES[type].border) || null;
+  }
+
+  function getSourcePortColor(connEl) {
+    if (!connEl) return null;
+    var group = connEl.closest('.cn-conn-group');
+    if (group) {
+      var idx = Array.from(group.children).indexOf(connEl);
+      return idx === 0 ? '#00C853' : '#E53935';
+    }
+    return getNodeAccentColor(connEl.closest('.canvas-node'));
+  }
+
+  function paintPort(connEl, color, strokeWidth) {
+    if (!connEl) return;
+    var stroke = color || '#9E9E9E';
+    var wCircle = strokeWidth || 1.3;
+    var circle = connEl.querySelector('circle');
+    if (circle) {
+      circle.setAttribute('stroke', stroke);
+      circle.setAttribute('stroke-width', wCircle);
+    }
+    connEl.querySelectorAll('path, line').forEach(function(el) {
+      var s = el.getAttribute('stroke');
+      if (s && s !== 'none') el.setAttribute('stroke', stroke);
+      var f = el.getAttribute('fill');
+      if (f && f !== 'none' && f !== 'white') el.setAttribute('fill', stroke);
+    });
+  }
+
+  function capturePortPaint(connEl) {
+    if (!connEl) return null;
+    var snap = [];
+    connEl.querySelectorAll('circle, path, line').forEach(function(el) {
+      snap.push({
+        el: el,
+        stroke: el.getAttribute('stroke'),
+        strokeWidth: el.getAttribute('stroke-width'),
+        fill: el.getAttribute('fill')
+      });
+    });
+    return snap;
+  }
+
+  function restorePortPaint(snap) {
+    if (!snap) return;
+    snap.forEach(function(item) {
+      if (item.stroke === null) item.el.removeAttribute('stroke');
+      else item.el.setAttribute('stroke', item.stroke);
+      if (item.strokeWidth === null) item.el.removeAttribute('stroke-width');
+      else item.el.setAttribute('stroke-width', item.strokeWidth);
+      if (item.fill === null) item.el.removeAttribute('fill');
+      else item.el.setAttribute('fill', item.fill);
+    });
+  }
+
+  function resetPort(connEl) {
+    if (!connEl) return;
+    if (connEl.dataset.connected === 'true') {
+      var isInput = connEl.classList.contains('cn-conn--input');
+      var color = isInput ? getNodeAccentColor(connEl.closest('.canvas-node')) : getSourcePortColor(connEl);
+      paintPort(connEl, color, 1.3);
+    } else {
+      paintPort(connEl, null, null);
+    }
+  }
+
+  function cancelConnDrag() {
+    document.body.classList.remove('connecting');
+    if (lastHovered) {
+      resetPort(lastHovered);
+      lastHovered = null;
+    }
+    if (connStart && connStart.paintSnap) {
+      restorePortPaint(connStart.paintSnap);
+    }
+    if (tempLine && tempLine.parentNode) {
+      tempLine.parentNode.removeChild(tempLine);
+    }
+    tempLine = null;
+    connStart = null;
+  }
 
   flowLayer.addEventListener('mousedown', function(e) {
     var connEl = e.target.closest('.cn-conn');
@@ -1838,48 +1947,65 @@ function toggleNodesPanel() {
     tempLine.setAttribute('stroke', color);
     tempLine.setAttribute('stroke-width', '2');
     tempLine.setAttribute('fill', 'none');
+    tempLine.setAttribute('pointer-events', 'none');
     connSvg.appendChild(tempLine);
-    connStart = { el: connEl, x: pos.x, y: pos.y, nodeEl: nodeEl, color: color, vertical: nodeEl.classList.contains('vertical') };
+    var srcSnap = capturePortPaint(connEl);
+    connStart = { el: connEl, x: pos.x, y: pos.y, nodeEl: nodeEl, color: color, vertical: nodeEl.classList.contains('vertical'), paintSnap: srcSnap };
+    paintPort(connEl, getSourcePortColor(connEl), 2);
+
+    document.body.classList.add('connecting');
+
     e.stopPropagation();
     e.preventDefault();
   });
 
   window.addEventListener('mousemove', function(e) {
     if (!tempLine) return;
-    var pt = screenToFlow(e.clientX, e.clientY);
+    var endX, endY;
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    var targetPort = el && el.closest('.cn-conn');
+    if (targetPort && isValidTarget(targetPort, connStart.nodeEl) && targetPort.classList.contains('cn-conn--input')) {
+      if (lastHovered && lastHovered !== targetPort) {
+        resetPort(lastHovered);
+      }
+      if (lastHovered !== targetPort) {
+        var nodeColor = getNodeAccentColor(targetPort.closest('.canvas-node'));
+        paintPort(targetPort, nodeColor, 2);
+        lastHovered = targetPort;
+      }
+      var cp = getConnCenter(targetPort);
+      endX = cp.x; endY = cp.y;
+    } else {
+      if (lastHovered) {
+        resetPort(lastHovered);
+        lastHovered = null;
+      }
+      var pt = screenToFlow(e.clientX, e.clientY);
+      endX = pt.x; endY = pt.y;
+    }
     var bfn = connStart.vertical ? verticalBezier : bezier;
-    tempLine.setAttribute('d', bfn(connStart.x, connStart.y, pt.x, pt.y));
+    tempLine.setAttribute('d', bfn(connStart.x, connStart.y, endX, endY));
   });
 
   window.addEventListener('mouseup', function(e) {
     if (!tempLine) return;
     var target = document.elementFromPoint(e.clientX, e.clientY);
     var connEl = target && target.closest('.cn-conn');
-    if (connEl && connEl !== connStart.el) {
-      var nodeEl = connEl.closest('.canvas-node');
-      if (nodeEl && nodeEl !== connStart.nodeEl) {
-        var body = nodeEl.querySelector('.cn-body');
-        var siblings = Array.from(nodeEl.children);
-        var connIdx = siblings.indexOf(connEl);
-        var bodyIdx = siblings.indexOf(body);
-        if (connIdx < bodyIdx) {
-          var label = null;
-          var srcGroup = connStart.el.closest('.cn-conn-group');
-          if (srcGroup) {
-            var srcIdx = Array.from(srcGroup.children).indexOf(connStart.el);
-            label = srcIdx === 0 ? 'then' : 'else';
-          }
-          if (connStart.vertical) {
-            addVerticalConnection(connStart.el, connEl, connStart.color, label);
-          } else {
-            addConnection(connStart.el, connEl, connStart.color, label);
-          }
-        }
+    if (connEl && isValidTarget(connEl, connStart.nodeEl)) {
+      var label = null;
+      var srcGroup = connStart.el.closest('.cn-conn-group');
+      if (srcGroup) {
+        var srcIdx = Array.from(srcGroup.children).indexOf(connStart.el);
+        label = srcIdx === 0 ? 'then' : 'else';
+      }
+      connStart.paintSnap = null;
+      if (connStart.vertical) {
+        addVerticalConnection(connStart.el, connEl, connStart.color, label);
+      } else {
+        addConnection(connStart.el, connEl, connStart.color, label);
       }
     }
-    connSvg.removeChild(tempLine);
-    tempLine = null;
-    connStart = null;
+    cancelConnDrag();
   });
 
   // AI Modal
@@ -1960,6 +2086,14 @@ function toggleNodesPanel() {
       applyDashLabel(path, textEl);
     }
     connections.push({ fromEl: fromEl, toEl: toEl, path: path, textEl: textEl, label: label });
+    if (toEl && toEl.classList.contains('cn-conn--input')) {
+      toEl.dataset.connected = 'true';
+      paintPort(toEl, getNodeAccentColor(toEl.closest('.canvas-node')), 1.3);
+    }
+    if (fromEl) {
+      fromEl.dataset.connected = 'true';
+      paintPort(fromEl, getSourcePortColor(fromEl), 1.3);
+    }
   }
 
   function addVerticalConnection(fromEl, toEl, color, label) {
@@ -1985,6 +2119,14 @@ function toggleNodesPanel() {
       applyDashLabel(path, textEl);
     }
     connections.push({ fromEl: fromEl, toEl: toEl, path: path, vertical: true, textEl: textEl, label: label });
+    if (toEl && toEl.classList.contains('cn-conn--input')) {
+      toEl.dataset.connected = 'true';
+      paintPort(toEl, getNodeAccentColor(toEl.closest('.canvas-node')), 1.3);
+    }
+    if (fromEl) {
+      fromEl.dataset.connected = 'true';
+      paintPort(fromEl, getSourcePortColor(fromEl), 1.3);
+    }
   }
 
   function createVerticalCanvasNode(type, x, y) {
